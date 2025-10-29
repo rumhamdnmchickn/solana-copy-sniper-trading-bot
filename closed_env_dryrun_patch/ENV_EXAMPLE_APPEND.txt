@@ -1,0 +1,9 @@
+# --- BEGIN: Closed-Environment Controls ---
+# DRY_RUN: build routes but never send; SIMULATE: call RPC simulateTransaction; LIVE: actually send
+EXECUTION_MODE=DRY_RUN
+# Record incoming WS frames to a JSONL file
+RECORD_WS=1
+WS_RECORD_PATH=./ws_feed.jsonl
+# Optional offline replay (no network): use `cargo run --bin replay_ws`
+REPLAY_WS_PATH=./ws_feed.jsonl
+# --- END: Closed-Environment Controls ---

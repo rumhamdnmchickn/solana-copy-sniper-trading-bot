@@ -1,0 +1,22 @@
+*** src/processor/sniper_bot.rs	original
+--- src/processor/sniper_bot.rs	modified
+***************
+*** 1,30 ****
+  // ... existing imports ...
+--- 1,40 ----
+  // ... existing imports ...
++ use crate::execution::{ExecutionMode, TradeExecutor, DryRunExecutor, SimExecutor, LiveExecutor};
++ 
++ // Pick executor once (e.g., in your AppState): 
++ // let mode = ExecutionMode::from_env();
++ // let exec: Arc<dyn TradeExecutor> = match mode { DryRun => Arc::new(DryRunExecutor), Simulate => Arc::new(SimExecutor{/*rpc*/}), Live => Arc::new(LiveExecutor{/*rpc*/}) };
+***************
+*** 180,220 ****
+      // Build swap instructions from parsed data for buy
+      let jup_tx_bytes = build_jupiter_swap_bytes(...)?;
+      // Send transaction
+-     let sig = rpc.send_and_confirm_transaction(&jup_tx)?;
+-     logger.log(format!("Buy transaction sent: {}", sig));
++     // Closed-environment path:
++     let res = exec.execute(jup_tx_bytes).await?;
++     logger.log(format!("Buy {}: ok={}, mode={}, note={}", mint_str, res.ok, res.mode, res.tx_sig_or_reason));
