@@ -17,4 +17,5 @@ jobs:
         uses: SonarSource/sonarqube-scan-action@86fe81775628f1c6349c28baab87881a2170f495
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_SCANNER_OPTS: "-X"
+          SONAR_SCANNER_DEBUG: true
+
