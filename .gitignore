@@ -24,4 +24,4 @@ backend
 /record/raydium/
 
 # Logs
-*.log 
+*.log !Cargo.lock
