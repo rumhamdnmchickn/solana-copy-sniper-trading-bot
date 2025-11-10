@@ -285,6 +285,16 @@ pub fn create_rpc_client() -> Result<Arc<anchor_client::solana_client::rpc_clien
     Ok(Arc::new(rpc_client))
 }
 
+pub fn create_rpc_client_set() -> Result<Arc<crate::library::rpc_failover::RpcClientSet>, Box<dyn std::error::Error>> {
+    // Read primary RPC (this will panic if missing like your other import_env_var usage).
+    let rpc_primary = std::env::var("RPC_HTTP").unwrap_or_else(|_| import_env_var("RPC_HTTP"));
+    let rpc_backup = std::env::var("RPC_BACKUP").ok();
+
+    // Construct RpcClientSet from new library module.
+    let rpc_set = crate::library::rpc_failover::RpcClientSet::new(rpc_primary.as_str(), rpc_backup.as_deref());
+    Ok(Arc::new(rpc_set))
+}
+
 pub async fn create_nonblocking_rpc_client(
 ) -> Result<Arc<anchor_client::solana_client::nonblocking::rpc_client::RpcClient>> {
     let rpc_http = import_env_var("RPC_HTTP");
