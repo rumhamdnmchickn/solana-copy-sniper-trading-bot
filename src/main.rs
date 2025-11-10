@@ -1,3 +1,4 @@
+ url=https://github.com/rumhamdnmchickn/solana-copy-sniper-trading-bot/blob/feat/universal-gates-wiring/src/main.rs
 /*
  * Copy Trading Bot with PumpSwap Notification Mode
  * 
@@ -34,6 +35,7 @@ use spl_token::instruction::sync_native;
 use spl_token::ui_amount_to_amount;
 use spl_associated_token_account::get_associated_token_address;
 
+use solana_vntr_sniper::common::rpc_failover::RpcFailover; // << added import
 
 
 /// Initialize the wallet token account list by fetching all token accounts owned by the wallet
@@ -46,29 +48,39 @@ async fn initialize_token_account_list(config: &Config) {
         // Get the token program pubkey
         let token_program = Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap();
         
-        // Query all token accounts owned by the wallet
-        let accounts = config.app_state.rpc_client.get_token_accounts_by_owner(
+        // Build failover RPC client from env and use it for token accounts retrieval.
+        let rpc = match RpcFailover::from_env() {
+            Ok(r) => r,
+            Err(e) => {
+                logger.log(format!("❌ Failed to initialize RPC failover: {}", e).red().to_string());
+                logger.log("⚠️  Cache will be populated as new accounts are discovered".yellow().to_string());
+                return;
+            }
+        };
+
+        // Query all token accounts owned by the wallet using failover RPC
+        let accounts = match rpc.get_token_accounts_by_owner(
             &wallet_pubkey,
             anchor_client::solana_client::rpc_request::TokenAccountsFilter::ProgramId(token_program)
-        );
-        match accounts {
-            Ok(accounts) => {
-                logger.log(format!("Found {} existing token accounts", accounts.len()));
-                
-                // Add each token account to our global cache
-                for account in accounts {
-                    let account_pubkey = Pubkey::from_str(&account.pubkey).unwrap();
-                    WALLET_TOKEN_ACCOUNTS.insert(account_pubkey);
-                    logger.log(format!("✅ Cached token account: {}", account.pubkey ));
-                }
-                
-                logger.log(format!("✅ Token account cache initialized with {} accounts", WALLET_TOKEN_ACCOUNTS.size()));
-            },
+        ) {
+            Ok(v) => v,
             Err(e) => {
                 logger.log(format!("❌ Error fetching token accounts: {}", e).red().to_string());
                 logger.log("⚠️  Cache will be populated as new accounts are discovered".yellow().to_string());
+                return;
             }
+        };
+
+        logger.log(format!("Found {} existing token accounts", accounts.len()));
+                
+        // Add each token account to our global cache
+        for account in accounts {
+            let account_pubkey = Pubkey::from_str(&account.pubkey).unwrap();
+            WALLET_TOKEN_ACCOUNTS.insert(account_pubkey);
+            logger.log(format!("✅ Cached token account: {}", account.pubkey ));
         }
+                
+        logger.log(format!("✅ Token account cache initialized with {} accounts", WALLET_TOKEN_ACCOUNTS.size()));
     } else {
         logger.log("❌ Failed to get wallet pubkey, can't initialize token account list".red().to_string());
     }
@@ -113,8 +125,13 @@ async fn wrap_sol(config: &Config, amount: f64) -> Result<(), String> {
         ).map_err(|e| format!("Failed to create sync native instruction: {}", e))?
     );
     
-    // Send transaction
-    let recent_blockhash = config.app_state.rpc_client.get_latest_blockhash()
+    // Use RPC failover to get recent blockhash and send tx
+    let rpc = match RpcFailover::from_env() {
+        Ok(r) => r,
+        Err(e) => return Err(format!("Failed to initialize RPC failover: {}", e)),
+    };
+
+    let recent_blockhash = rpc.get_latest_blockhash()
         .map_err(|e| format!("Failed to get recent blockhash: {}", e))?;
     
     let transaction = Transaction::new_signed_with_payer(
@@ -124,7 +141,7 @@ async fn wrap_sol(config: &Config, amount: f64) -> Result<(), String> {
         recent_blockhash,
     );
     
-    match config.app_state.rpc_client.send_and_confirm_transaction(&transaction) {
+    match rpc.send_and_confirm_transaction(&transaction) {
         Ok(signature) => {
             logger.log(format!("SOL wrapped successfully, signature: {}", signature));
             Ok(())
@@ -153,8 +170,14 @@ async fn unwrap_sol(config: &Config) -> Result<(), String> {
     
     logger.log(format!("WSOL account address: {}", wsol_account));
     
+    // Build RPC failover client
+    let rpc = match RpcFailover::from_env() {
+        Ok(r) => r,
+        Err(e) => return Err(format!("Failed to initialize RPC failover: {}", e)),
+    };
+
     // Check if WSOL account exists
-    match config.app_state.rpc_client.get_account(&wsol_account) {
+    match rpc.get_account(&wsol_account) {
         Ok(_) => {
             logger.log(format!("Found WSOL account: {}", wsol_account));
         },
@@ -173,7 +196,7 @@ async fn unwrap_sol(config: &Config) -> Result<(), String> {
     ).map_err(|e| format!("Failed to create close account instruction: {}", e))?;
     
     // Send transaction
-    let recent_blockhash = config.app_state.rpc_client.get_latest_blockhash()
+    let recent_blockhash = rpc.get_latest_blockhash()
         .map_err(|e| format!("Failed to get recent blockhash: {}", e))?;
     
     let transaction = Transaction::new_signed_with_payer(
@@ -183,7 +206,7 @@ async fn unwrap_sol(config: &Config) -> Result<(), String> {
         recent_blockhash,
     );
     
-    match config.app_state.rpc_client.send_and_confirm_transaction(&transaction) {
+    match rpc.send_and_confirm_transaction(&transaction) {
         Ok(signature) => {
             logger.log(format!("WSOL unwrapped successfully, signature: {}", signature));
             Ok(())
@@ -201,6 +224,12 @@ async fn sell_all_tokens(config: &Config) -> Result<(), String> {
     let execute_logger = solana_vntr_sniper::common::logger::Logger::new("[EXECUTE-SWAP] => ".yellow().to_string());
     let sell_logger = solana_vntr_sniper::common::logger::Logger::new("[SELL-TOKEN] ".cyan().to_string());
     
+    // Build RPC failover client
+    let rpc = match RpcFailover::from_env() {
+        Ok(r) => r,
+        Err(e) => return Err(format!("Failed to initialize RPC failover: {}", e)),
+    };
+
     // Get wallet pubkey
     let wallet_pubkey = match config.app_state.wallet.try_pubkey() {
         Ok(pk) => pk,
@@ -213,7 +242,7 @@ async fn sell_all_tokens(config: &Config) -> Result<(), String> {
     let token_program = Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap();
     
     // Query all token accounts owned by the wallet
-    let accounts = config.app_state.rpc_client.get_token_accounts_by_owner(
+    let accounts = rpc.get_token_accounts_by_owner(
         &wallet_pubkey,
         anchor_client::solana_client::rpc_request::TokenAccountsFilter::ProgramId(token_program)
     ).map_err(|e| format!("Failed to get token accounts: {}", e))?;
@@ -225,7 +254,7 @@ async fn sell_all_tokens(config: &Config) -> Result<(), String> {
     
     logger.log(format!("Found {} token accounts", accounts.len()));
     
-    // Create Jupiter API client
+    // Create Jupiter API client (non-blocking client still uses config.app_state.rpc_nonblocking_client)
     let jupiter_client = JupiterClient::new(config.app_state.rpc_nonblocking_client.clone());
     
     // Filter and collect token information
@@ -240,7 +269,7 @@ async fn sell_all_tokens(config: &Config) -> Result<(), String> {
             .map_err(|_| format!("Invalid token account pubkey: {}", account_info.pubkey))?;
         
         // Get account data
-        let account_data = match config.app_state.rpc_client.get_account(&token_account) {
+        let account_data = match rpc.get_account(&token_account) {
             Ok(data) => data,
             Err(e) => {
                 logger.log(format!("Failed to get account data for {}: {}", token_account, e).red().to_string());
@@ -258,7 +287,7 @@ async fn sell_all_tokens(config: &Config) -> Result<(), String> {
             total_token_count += 1;
             
             // Get mint account to determine decimals
-            let mint_data = match config.app_state.rpc_client.get_account(&token_data.mint) {
+            let mint_data = match rpc.get_account(&token_data.mint) {
                 Ok(data) => data,
                 Err(e) => {
                     logger.log(format!("Failed to get mint data for {}: {}", token_data.mint, e).yellow().to_string());
@@ -369,8 +398,14 @@ async fn close_all_token_accounts(config: &Config) -> Result<(), String> {
     // Get the token program pubkey
     let token_program = Pubkey::from_str("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA").unwrap();
     
+    // Build RPC failover client
+    let rpc = match RpcFailover::from_env() {
+        Ok(r) => r,
+        Err(e) => return Err(format!("Failed to initialize RPC failover: {}", e)),
+    };
+
     // Query all token accounts owned by the wallet
-    let accounts = config.app_state.rpc_client.get_token_accounts_by_owner(
+    let accounts = rpc.get_token_accounts_by_owner(
         &wallet_pubkey,
         anchor_client::solana_client::rpc_request::TokenAccountsFilter::ProgramId(token_program)
     ).map_err(|e| format!("Failed to get token accounts: {}", e))?;
@@ -391,7 +426,7 @@ async fn close_all_token_accounts(config: &Config) -> Result<(), String> {
             .map_err(|_| format!("Invalid token account pubkey: {}", account_info.pubkey))?;
         
         // Skip WSOL accounts with non-zero balance (these need to be unwrapped first)
-        let account_data = match config.app_state.rpc_client.get_account(&token_account) {
+        let account_data = match rpc.get_account(&token_account) {
             Ok(data) => data,
             Err(e) => {
                 logger.log(format!("Failed to get account data for {}: {}", token_account, e).red().to_string());
@@ -420,7 +455,7 @@ async fn close_all_token_accounts(config: &Config) -> Result<(), String> {
         ).map_err(|e| format!("Failed to create close instruction for {}: {}", token_account, e))?;
         
         // Send transaction
-        let recent_blockhash = config.app_state.rpc_client.get_latest_blockhash()
+        let recent_blockhash = rpc.get_latest_blockhash()
             .map_err(|e| format!("Failed to get recent blockhash: {}", e))?;
         
         let transaction = Transaction::new_signed_with_payer(
@@ -430,7 +465,7 @@ async fn close_all_token_accounts(config: &Config) -> Result<(), String> {
             recent_blockhash,
         );
         
-        match config.app_state.rpc_client.send_and_confirm_transaction(&transaction) {
+        match rpc.send_and_confirm_transaction(&transaction) {
             Ok(signature) => {
                 logger.log(format!("Closed token account {}, signature: {}", token_account, signature));
                 closed_count += 1;
