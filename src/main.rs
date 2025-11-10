@@ -34,6 +34,19 @@ use spl_token::instruction::sync_native;
 use spl_token::ui_amount_to_amount;
 use spl_associated_token_account::get_associated_token_address;
 
+// pseudocode snippet to add early in async main
+let cfg = match crate::common::config::RuntimeConfig::from_env() {
+    Ok(c) => c,
+    Err(e) => {
+        eprintln!("Config load error: {:?}", e);
+        std::process::exit(1);
+    }
+};
+env_logger::Builder::from_env(env_logger::Env::default().default_filter_or(cfg.log_level.clone().unwrap_or_else(|| "info".into()))).init();
+
+let rpc_client = crate::common::rpc_client::RpcClient::new(cfg.clone());
+// Pass rpc_client into modules that perform RPC JSON calls
+
 /// Initialize the wallet token account list by fetching all token accounts owned by the wallet
 async fn initialize_token_account_list(config: &Config) {
     let logger = solana_vntr_sniper::common::logger::Logger::new("[INIT-TOKEN-ACCOUNTS] => ".green().to_string());
