@@ -1,0 +1,55 @@
+name: Rust CI
+
+on:
+  pull_request:
+    branches: [ master, main, "*" ]
+  push:
+    branches: [ master, main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-lint:
+    name: build • test • fmt • clippy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable) + tools
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      # Fast compile sanity (no binary)
+      - name: cargo check
+        run: cargo check --all --locked
+
+      # Full release build (catches more)
+      - name: cargo build (release)
+        run: cargo build --all --locked --release
+
+      # Unit tests
+      - name: cargo test
+        run: cargo test --all --locked -- --nocapture
+
+      # Formatting (fail on diffs)
+      - name: cargo fmt (check)
+        run: cargo fmt --all -- --check
+
+      # Lints (treat warnings as errors)
+      - name: cargo clippy
+        run: cargo clippy --all -- -D warnings
