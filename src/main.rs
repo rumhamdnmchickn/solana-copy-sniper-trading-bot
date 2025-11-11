@@ -6,7 +6,7 @@
  * - Transaction processing now runs in separate tokio tasks to ensure main monitoring continues
  * - Added placeholder for future selling strategy implementation
  * - PumpFun protocol functionality remains unchanged
- * - Added caching and batch RPC calls for improved performance
+ * - Added caching and batch RPC calls for improved performance...
  */
 
 use anchor_client::solana_sdk::pubkey::Pubkey;
