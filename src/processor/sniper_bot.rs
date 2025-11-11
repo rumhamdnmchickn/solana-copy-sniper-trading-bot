@@ -712,31 +712,32 @@ async fn verify_transaction(
             .await
         {
             Ok(result) => {
-                if let Some(status_opt) = result.value.get(0) {
-                    if let Some(status) = status_opt {
-                        if status.err.is_some() {
-                            // Transaction failed
-                            return Err(format!("Transaction failed: {:?}", status.err));
-                        } else if let Some(conf_status) = &status.confirmation_status {
-                            if matches!(
-                                conf_status,
-                                TransactionConfirmationStatus::Finalized
-                                    | TransactionConfirmationStatus::Confirmed
-                            ) {
-                                return Ok(true);
-                            } else {
-                                logger.log(
-                                    format!(
-                                        "Transaction not yet confirmed (status: {:?}), retrying...",
-                                        conf_status
-                                    )
-                                    .yellow()
-                                    .to_string(),
-                                );
-                            }
-                        } else {
+                // Use `.first()` (Clippy-friendly) and pattern-match into the Option<Option<_>>
+                if let Some(Some(status)) = result.value.first() {
+                    // Transaction failed?
+                    if status.err.is_some() {
+                        return Err(format!("Transaction failed: {:?}", status.err));
+                    }
+
+                    // Check confirmation status
+                    match &status.confirmation_status {
+                        Some(TransactionConfirmationStatus::Finalized)
+                        | Some(TransactionConfirmationStatus::Confirmed) => {
+                            return Ok(true);
                         }
-                    } else {
+                        Some(conf_status) => {
+                            logger.log(
+                                format!(
+                                    "Transaction not yet confirmed (status: {:?}), retrying...",
+                                    conf_status
+                                )
+                                .yellow()
+                                .to_string(),
+                            );
+                        }
+                        None => {
+                            // No confirmation status yet — continue retrying
+                        }
                     }
                 }
             }
