@@ -681,8 +681,8 @@ impl TokenManager {
         let final_metrics_count = TOKEN_METRICS.len();
         let final_tracking_count = TOKEN_TRACKING.len();
         self.logger.log(format!(
-            "✅ Selling strategy cleanup completed. Removed: {}, Remaining metrics: {}, tracking: {}", 
-            cleaned_count, 
+            "✅ Selling strategy cleanup completed. Removed: {}, Remaining metrics: {}, tracking: {}",
+            cleaned_count,
             final_metrics_count,
             final_tracking_count
         ).green().to_string());
@@ -1599,7 +1599,7 @@ impl SellingEngine {
             self.logger.log(
                 format!(
                 "📉 Selling due to retracement: {:.2}% >= {:.2}% (PNL: {:.2}%, still profitable)",
-                retracement, self.config.dynamic_whale_selling.retracement_percentage, 
+                retracement, self.config.dynamic_whale_selling.retracement_percentage,
                 pnl
             )
                 .yellow()
