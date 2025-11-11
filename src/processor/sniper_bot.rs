@@ -3153,16 +3153,13 @@ pub async fn execute_sell(
                                     if signatures.is_empty() {
                                         return Err("No transaction signature returned".to_string());
                                     }
-                                    
                                     let signature = &signatures[0];
                                     logger.log(format!("Sell transaction sent: {}", signature));
-                                    
                                     // Verify transaction
                                     match verify_transaction(&signature.to_string(), app_state.clone(), &logger).await {
                                         Ok(verified) => {
                                             if verified {
                                                 logger.log("Sell transaction verified successfully".to_string());
-                                                
                                                 Ok(())
                                             } else {
                                                 Err("Sell transaction verification failed".to_string())
@@ -3431,10 +3428,8 @@ pub async fn execute_sell(
                                     if signatures.is_empty() {
                                         return Err("No transaction signature returned".to_string());
                                     }
-                                    
                                     let signature = &signatures[0];
                                     logger.log(format!("Sell transaction sent: {}", signature));
-                                    
                                     match verify_transaction(&signature.to_string(), app_state.clone(), &logger).await {
                                         Ok(verified) => {
                                             if verified {
