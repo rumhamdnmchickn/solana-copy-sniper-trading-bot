@@ -357,8 +357,12 @@ pub fn import_wallet() -> Result<Arc<Keypair>> {
             .to_string()
         );
         // Fail fast with a clear message instead of spinning indefinitely
-        panic!("Invalid PRIVATE_KEY in environment: length {}", priv_key.len());
+        panic!(
+            "Invalid PRIVATE_KEY in environment: length {}",
+            priv_key.len()
+        );
     }
+
     let wallet: Keypair = Keypair::from_base58_string(priv_key.as_str());
 
     Ok(Arc::new(wallet))
