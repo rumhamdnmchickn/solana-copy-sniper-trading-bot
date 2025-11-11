@@ -1,12 +1,12 @@
+use crate::common::logger::Logger;
+use anyhow::{anyhow, Result};
+use colored::Colorize;
+use lazy_static::lazy_static;
+use solana_client::rpc_client::RpcClient;
+use solana_sdk::hash::Hash;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
-use solana_sdk::hash::Hash;
-use solana_client::rpc_client::RpcClient;
-use anyhow::{Result, anyhow};
-use colored::Colorize;
-use lazy_static::lazy_static;
-use crate::common::logger::Logger;
 
 // Global state for latest blockhash and timestamp
 lazy_static! {
@@ -25,15 +25,13 @@ pub struct BlockhashProcessor {
 impl BlockhashProcessor {
     pub async fn new(rpc_client: Arc<RpcClient>) -> Result<Self> {
         let logger = Logger::new("[BLOCKHASH-PROCESSOR] => ".cyan().to_string());
-        
-        Ok(Self {
-            rpc_client,
-            logger,
-        })
+
+        Ok(Self { rpc_client, logger })
     }
 
     pub async fn start(&self) -> Result<()> {
-        self.logger.log("Starting blockhash processor...".green().to_string());
+        self.logger
+            .log("Starting blockhash processor...".green().to_string());
 
         // Clone necessary components for the background task
         let rpc_client = self.rpc_client.clone();
@@ -46,15 +44,19 @@ impl BlockhashProcessor {
                         // Update global blockhash
                         let mut latest = LATEST_BLOCKHASH.write().await;
                         *latest = Some(blockhash);
-                        
+
                         // Update timestamp
                         let mut last_updated = BLOCKHASH_LAST_UPDATED.write().await;
                         *last_updated = Some(Instant::now());
-                        
+
                         // logger.log(format!("Updated latest blockhash: {}", blockhash));
                     }
                     Err(e) => {
-                        logger.log(format!("Error getting latest blockhash: {}", e).red().to_string());
+                        logger.log(
+                            format!("Error getting latest blockhash: {}", e)
+                                .red()
+                                .to_string(),
+                        );
                     }
                 }
 
@@ -66,7 +68,8 @@ impl BlockhashProcessor {
     }
 
     async fn update_blockhash_from_rpc(rpc_client: &RpcClient) -> Result<Hash> {
-        rpc_client.get_latest_blockhash()
+        rpc_client
+            .get_latest_blockhash()
             .map_err(|e| anyhow!("Failed to get blockhash from RPC: {}", e))
     }
 
@@ -74,7 +77,7 @@ impl BlockhashProcessor {
     async fn update_blockhash(hash: Hash) {
         let mut latest = LATEST_BLOCKHASH.write().await;
         *latest = Some(hash);
-        
+
         let mut last_updated = BLOCKHASH_LAST_UPDATED.write().await;
         *last_updated = Some(Instant::now());
     }
@@ -88,7 +91,7 @@ impl BlockhashProcessor {
                 return None;
             }
         }
-        
+
         let latest = LATEST_BLOCKHASH.read().await;
         *latest
     }
@@ -98,13 +101,19 @@ impl BlockhashProcessor {
         if let Some(hash) = Self::get_latest_blockhash().await {
             return Ok(hash);
         }
-        
+
         // Fallback to RPC if cached blockhash is stale or missing
-        self.logger.log("Cached blockhash is stale or missing, falling back to RPC...".yellow().to_string());
-        let new_hash = self.rpc_client.get_latest_blockhash()
+        self.logger.log(
+            "Cached blockhash is stale or missing, falling back to RPC..."
+                .yellow()
+                .to_string(),
+        );
+        let new_hash = self
+            .rpc_client
+            .get_latest_blockhash()
             .map_err(|e| anyhow!("Failed to get blockhash from RPC: {}", e))?;
-        
+
         Self::update_blockhash(new_hash).await;
         Ok(new_hash)
     }
-} 
+}

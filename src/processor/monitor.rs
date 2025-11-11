@@ -7,7 +7,7 @@ pub enum InstructionType {
     PumpBuy,
     PumpSell,
     PumpSwapBuy,
-    PumpSwapSell
+    PumpSwapSell,
 }
 
 #[derive(Clone, Debug)]
@@ -26,7 +26,6 @@ pub struct PoolInfo {
     pub quote_reserve: u64,
     pub coin_creator: Pubkey,
 }
-
 
 #[derive(Debug, Clone, Copy)]
 pub struct RetracementLevel {

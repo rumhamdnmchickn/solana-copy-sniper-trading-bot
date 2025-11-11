@@ -41,7 +41,12 @@ impl Logger {
 
     // Add success method to fix compilation errors in monitor.rs
     pub fn success(&self, message: String) -> String {
-        let log = format!("{} [{}] {}", self.prefix_with_date(), "SUCCESS".green().bold(), message);
+        let log = format!(
+            "{} [{}] {}",
+            self.prefix_with_date(),
+            "SUCCESS".green().bold(),
+            message
+        );
         println!("{}", log);
         log
     }

@@ -1,47 +1,51 @@
-use std::{str::FromStr, sync::Arc, time::Instant};
-use solana_program_pack::Pack;
-use solana_client::rpc_config::{RpcAccountInfoConfig, RpcProgramAccountsConfig};
-use solana_client::rpc_filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType};
-use solana_account_decoder::UiAccountEncoding;
+use crate::processor::transaction_parser::DexType;
 use anyhow::{anyhow, Result};
 use colored::Colorize;
+use solana_account_decoder::UiAccountEncoding;
+use solana_client::rpc_config::{RpcAccountInfoConfig, RpcProgramAccountsConfig};
+use solana_client::rpc_filter::{Memcmp, MemcmpEncodedBytes, RpcFilterType};
+use solana_program_pack::Pack;
 use solana_sdk::{
     instruction::{AccountMeta, Instruction},
     pubkey::Pubkey,
     signature::Keypair,
-    system_program,
     signer::Signer,
+    system_program,
 };
-use crate::processor::transaction_parser::DexType;
 use spl_associated_token_account::{
-    get_associated_token_address,
-    instruction::create_associated_token_account_idempotent
+    get_associated_token_address, instruction::create_associated_token_account_idempotent,
 };
 use spl_token::ui_amount_to_amount;
-
+use std::{str::FromStr, sync::Arc, time::Instant};
 
 use crate::{
-    common::{config::SwapConfig, logger::Logger, cache::WALLET_TOKEN_ACCOUNTS},
     block_engine::token,
+    common::{cache::WALLET_TOKEN_ACCOUNTS, config::SwapConfig, logger::Logger},
     processor::swap::{SwapDirection, SwapInType},
 };
 
-pub const TOKEN_PROGRAM: Pubkey = solana_sdk::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
-pub const TOKEN_2022_PROGRAM: Pubkey = solana_sdk::pubkey!("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
-pub const ASSOCIATED_TOKEN_PROGRAM: Pubkey = solana_sdk::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
-pub const RAYDIUM_LAUNCHPAD_PROGRAM: Pubkey = solana_sdk::pubkey!("LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj");
-pub const RAYDIUM_LAUNCHPAD_AUTHORITY: Pubkey = solana_sdk::pubkey!("WLHv2UAZm6z4KyaaELi5pjdbJh6RESMva1Rnn8pJVVh");
-pub const RAYDIUM_GLOBAL_CONFIG: Pubkey = solana_sdk::pubkey!("6s1xP3hpbAfFoNtUNF8mfHsjr2Bd97JxFJRWLbL6aHuX");
-pub const RAYDIUM_PLATFORM_CONFIG: Pubkey = solana_sdk::pubkey!("FfYek5vEz23cMkWsdJwG2oa6EphsvXSHrGpdALN4g6W1");
-pub const EVENT_AUTHORITY: Pubkey = solana_sdk::pubkey!("2DPAtwB8L12vrMRExbLuyGnC7n2J5LNoZQSejeQGpwkr");
+pub const TOKEN_PROGRAM: Pubkey =
+    solana_sdk::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+pub const TOKEN_2022_PROGRAM: Pubkey =
+    solana_sdk::pubkey!("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+pub const ASSOCIATED_TOKEN_PROGRAM: Pubkey =
+    solana_sdk::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
+pub const RAYDIUM_LAUNCHPAD_PROGRAM: Pubkey =
+    solana_sdk::pubkey!("LanMV9sAd7wArD4vJFi2qDdfnVhFxYSUg6eADduJ3uj");
+pub const RAYDIUM_LAUNCHPAD_AUTHORITY: Pubkey =
+    solana_sdk::pubkey!("WLHv2UAZm6z4KyaaELi5pjdbJh6RESMva1Rnn8pJVVh");
+pub const RAYDIUM_GLOBAL_CONFIG: Pubkey =
+    solana_sdk::pubkey!("6s1xP3hpbAfFoNtUNF8mfHsjr2Bd97JxFJRWLbL6aHuX");
+pub const RAYDIUM_PLATFORM_CONFIG: Pubkey =
+    solana_sdk::pubkey!("FfYek5vEz23cMkWsdJwG2oa6EphsvXSHrGpdALN4g6W1");
+pub const EVENT_AUTHORITY: Pubkey =
+    solana_sdk::pubkey!("2DPAtwB8L12vrMRExbLuyGnC7n2J5LNoZQSejeQGpwkr");
 pub const SOL_MINT: Pubkey = solana_sdk::pubkey!("So11111111111111111111111111111111111111112");
 pub const BUY_DISCRIMINATOR: [u8; 8] = [250, 234, 13, 123, 213, 156, 19, 236]; // buy_exact_in discriminator
 pub const SELL_DISCRIMINATOR: [u8; 8] = [149, 39, 222, 155, 211, 124, 152, 26]; // sell_exact_in discriminator
 
 const TEN_THOUSAND: u64 = 10000;
 const POOL_VAULT_SEED: &[u8] = b"pool_vault";
-
-
 
 /// A struct to represent the Raydium pool which uses constant product AMM
 #[derive(Debug, Clone)]
@@ -72,12 +76,11 @@ impl Raydium {
         }
     }
 
-    pub async fn get_raydium_pool(
-        &self,
-        mint_str: &str,
-    ) -> Result<RaydiumPool> {
+    pub async fn get_raydium_pool(&self, mint_str: &str) -> Result<RaydiumPool> {
         let mint = Pubkey::from_str(mint_str).map_err(|_| anyhow!("Invalid mint address"))?;
-        let rpc_client = self.rpc_client.clone()
+        let rpc_client = self
+            .rpc_client
+            .clone()
             .ok_or_else(|| anyhow!("RPC client not initialized"))?;
         get_pool_info(rpc_client, mint).await
     }
@@ -87,7 +90,7 @@ impl Raydium {
         // Since we're now using trade_info.price directly in the main flow,
         // this fallback method returns a placeholder value
         let _pool = self.get_raydium_pool(mint_str).await?;
-        
+
         // Return a placeholder price since the real price should come from trade_info
         // This method is rarely used in the main trading flow
         // Note: The correct Raydium Launchpad price formula is:
@@ -98,23 +101,23 @@ impl Raydium {
     async fn get_or_fetch_pool_info(
         &self,
         trade_info: &crate::processor::transaction_parser::TradeInfoFromToken,
-        mint: Pubkey
+        mint: Pubkey,
     ) -> Result<RaydiumPool> {
         // Use pool_id from trade_info instead of fetching it dynamically
         let pool_id = Pubkey::from_str(&trade_info.pool_id)
             .map_err(|e| anyhow!("Invalid pool_id in trade_info: {}", e))?;
-        
+
         // For Raydium Launchpad, derive pool vault addresses using PDA (Program Derived Address)
         let pump_program = RAYDIUM_LAUNCHPAD_PROGRAM;
         let sol_mint = SOL_MINT;
-        
+
         // Derive pool vault addresses using PDA with specific seeds
         let base_seeds = [POOL_VAULT_SEED, pool_id.as_ref(), mint.as_ref()];
         let (pool_base_account, _) = Pubkey::find_program_address(&base_seeds, &pump_program);
-        
+
         let quote_seeds = [POOL_VAULT_SEED, pool_id.as_ref(), sol_mint.as_ref()];
         let (pool_quote_account, _) = Pubkey::find_program_address(&quote_seeds, &pump_program);
-        
+
         let pool_info = RaydiumPool {
             pool_id,
             base_mint: mint,
@@ -122,12 +125,10 @@ impl Raydium {
             pool_base_account,
             pool_quote_account,
         };
-        
 
-            
         Ok(pool_info)
     }
-    
+
     // Helper method to determine the correct token program for a mint
     async fn get_token_program(&self, mint: &Pubkey) -> Result<Pubkey> {
         if let Some(rpc_client) = &self.rpc_client {
@@ -138,7 +139,7 @@ impl Raydium {
                     } else {
                         Ok(TOKEN_PROGRAM)
                     }
-                },
+                }
                 Err(_) => {
                     // Default to TOKEN_PROGRAM if we can't fetch the account
                     Ok(TOKEN_PROGRAM)
@@ -149,7 +150,7 @@ impl Raydium {
             Ok(TOKEN_PROGRAM)
         }
     }
-    
+
     // Highly optimized build_swap_from_parsed_data
     pub async fn build_swap_from_parsed_data(
         &self,
@@ -158,22 +159,22 @@ impl Raydium {
     ) -> Result<(Arc<Keypair>, Vec<Instruction>, f64)> {
         let owner = self.keypair.pubkey();
         let mint = Pubkey::from_str(&trade_info.mint)?;
-        
+
         // Get token program for the mint
         let token_program = self.get_token_program(&mint).await?;
-        
+
         // Prepare swap parameters
         let (_token_in, _token_out, discriminator) = match swap_config.swap_direction {
             SwapDirection::Buy => (SOL_MINT, mint, BUY_DISCRIMINATOR),
             SwapDirection::Sell => (mint, SOL_MINT, SELL_DISCRIMINATOR),
         };
-        
+
         let mut instructions = Vec::with_capacity(3); // Pre-allocate for typical case
-        
+
         // Check and create token accounts if needed
         let token_ata = get_associated_token_address(&owner, &mint);
         let wsol_ata = get_associated_token_address(&owner, &SOL_MINT);
-        
+
         // Check if token account exists and create if needed
         if !WALLET_TOKEN_ACCOUNTS.contains(&token_ata) {
             // Double-check with RPC to see if the account actually exists
@@ -183,29 +184,32 @@ impl Raydium {
                         // Account exists, add to cache
                         WALLET_TOKEN_ACCOUNTS.insert(token_ata);
                         true
-                    },
-                    Err(_) => false
+                    }
+                    Err(_) => false,
                 }
             } else {
                 false // No RPC client, assume account doesn't exist
             };
-            
+
             if !account_exists {
                 let logger = Logger::new("[RAYDIUM-ATA-CREATE] => ".yellow().to_string());
-                logger.log(format!("Creating token ATA for mint {} at address {}", mint, token_ata));
-                
+                logger.log(format!(
+                    "Creating token ATA for mint {} at address {}",
+                    mint, token_ata
+                ));
+
                 instructions.push(create_associated_token_account_idempotent(
                     &owner,
                     &owner,
                     &mint,
                     &TOKEN_PROGRAM, // Always use legacy token program for ATA creation
                 ));
-                
+
                 // Cache the account since we're creating it
                 WALLET_TOKEN_ACCOUNTS.insert(token_ata);
             }
         }
-        
+
         // Check if WSOL account exists and create if needed
         if !WALLET_TOKEN_ACCOUNTS.contains(&wsol_ata) {
             // Double-check with RPC to see if the account actually exists
@@ -215,29 +219,29 @@ impl Raydium {
                         // Account exists, add to cache
                         WALLET_TOKEN_ACCOUNTS.insert(wsol_ata);
                         true
-                    },
-                    Err(_) => false
+                    }
+                    Err(_) => false,
                 }
             } else {
                 false // No RPC client, assume account doesn't exist
             };
-            
+
             if !account_exists {
                 let logger = Logger::new("[RAYDIUM-WSOL-CREATE] => ".yellow().to_string());
                 logger.log(format!("Creating WSOL ATA at address {}", wsol_ata));
-                
+
                 instructions.push(create_associated_token_account_idempotent(
                     &owner,
                     &owner,
                     &SOL_MINT,
                     &TOKEN_PROGRAM, // WSOL always uses legacy token program
                 ));
-                
+
                 // Cache the account since we're creating it
                 WALLET_TOKEN_ACCOUNTS.insert(wsol_ata);
             }
         }
-        
+
         // Convert amount_in to lamports/token units
         // For Raydium Launchpad:
         // - Buy: amount_in is SOL amount (convert to lamports)
@@ -246,11 +250,11 @@ impl Raydium {
             SwapDirection::Buy => {
                 // For buy: amount_in is SOL amount, convert to lamports
                 ui_amount_to_amount(swap_config.amount_in, 9)
-            },
+            }
             SwapDirection::Sell => {
                 // For sell: need to get actual token balance first
                 let token_ata = get_associated_token_address(&owner, &mint);
-                
+
                 // Get actual token balance from blockchain
                 let actual_token_balance = if let Some(client) = &self.rpc_nonblocking_client {
                     match client.get_token_account(&token_ata).await {
@@ -259,13 +263,16 @@ impl Raydium {
                             match account.token_amount.amount.parse::<u64>() {
                                 Ok(balance) => balance,
                                 Err(_) => {
-                                    return Err(anyhow!("Failed to parse token balance for mint {}", mint));
+                                    return Err(anyhow!(
+                                        "Failed to parse token balance for mint {}",
+                                        mint
+                                    ));
                                 }
                             }
-                        },
+                        }
                         Ok(None) => {
                             return Err(anyhow!("Token account does not exist for mint {}", mint));
-                        },
+                        }
                         Err(e) => {
                             return Err(anyhow!("Failed to get token account balance: {}", e));
                         }
@@ -273,17 +280,18 @@ impl Raydium {
                 } else if let Some(client) = &self.rpc_client {
                     // Fallback to blocking client
                     match client.get_token_account(&token_ata) {
-                        Ok(Some(account)) => {
-                            match account.token_amount.amount.parse::<u64>() {
-                                Ok(balance) => balance,
-                                Err(_) => {
-                                    return Err(anyhow!("Failed to parse token balance for mint {}", mint));
-                                }
+                        Ok(Some(account)) => match account.token_amount.amount.parse::<u64>() {
+                            Ok(balance) => balance,
+                            Err(_) => {
+                                return Err(anyhow!(
+                                    "Failed to parse token balance for mint {}",
+                                    mint
+                                ));
                             }
                         },
                         Ok(None) => {
                             return Err(anyhow!("Token account does not exist for mint {}", mint));
-                        },
+                        }
                         Err(e) => {
                             return Err(anyhow!("Failed to get token account balance: {}", e));
                         }
@@ -291,26 +299,27 @@ impl Raydium {
                 } else {
                     return Err(anyhow!("No RPC client available to fetch token balance"));
                 };
-                
+
                 // Apply swap logic based on in_type
                 match swap_config.in_type {
                     SwapInType::Qty => {
                         // Use specified quantity (convert from UI amount to token units)
                         let decimals = 6; // All tokens are 6 decimals
                         ui_amount_to_amount(swap_config.amount_in, decimals)
-                    },
+                    }
                     SwapInType::Pct => {
                         // Use percentage of actual balance
                         let percentage = swap_config.amount_in.min(1.0); // Cap at 100%
-                        ((percentage * actual_token_balance as f64) as u64).max(1) // Ensure at least 1 token unit
+                        ((percentage * actual_token_balance as f64) as u64).max(1)
+                        // Ensure at least 1 token unit
                     }
                 }
             }
         };
-        
+
         // Calculate the actual quote amount using virtual reserves from trade_info
         let minimum_amount_out: u64 = 1; // to ignore slippage
-        
+
         // Create accounts based on swap direction
         let accounts = match swap_config.swap_direction {
             SwapDirection::Buy => {
@@ -327,7 +336,7 @@ impl Raydium {
                     pool_info.pool_quote_account,
                     &token_program,
                 )?
-            },
+            }
             SwapDirection::Sell => {
                 // For sell, we need pool info for accounts
                 let pool_info = self.get_or_fetch_pool_info(trade_info, mint).await?;
@@ -344,7 +353,7 @@ impl Raydium {
                 )?
             }
         };
-        
+
         instructions.push(create_swap_instruction(
             RAYDIUM_LAUNCHPAD_PROGRAM,
             discriminator,
@@ -352,14 +361,12 @@ impl Raydium {
             minimum_amount_out,
             accounts,
         ));
-        
+
         // Return the actual price from trade_info (convert from lamports to SOL)
         let price_in_sol = trade_info.price as f64 / 1_000_000_000.0;
-        
+
         Ok((self.keypair.clone(), instructions, price_in_sol))
     }
-    
-
 }
 
 /// Get the Raydium pool information for a specific token mint
@@ -368,16 +375,16 @@ pub async fn get_pool_info(
     mint: Pubkey,
 ) -> Result<RaydiumPool> {
     let logger = Logger::new("[RAYDIUM-GET-POOL-INFO] => ".blue().to_string());
-    
+
     // Initialize
     let sol_mint = SOL_MINT;
     let pump_program = RAYDIUM_LAUNCHPAD_PROGRAM;
-    
+
     // Use getProgramAccounts with config for better efficiency
     let mut pool_id = Pubkey::default();
     let mut retry_count = 0;
     let max_retries = 2;
-    
+
     // Try to find the pool
     while retry_count < max_retries && pool_id == Pubkey::default() {
         match rpc_client.get_program_accounts_with_config(
@@ -385,7 +392,10 @@ pub async fn get_pool_info(
             RpcProgramAccountsConfig {
                 filters: Some(vec![
                     RpcFilterType::DataSize(300),
-                    RpcFilterType::Memcmp(Memcmp::new(43, MemcmpEncodedBytes::Base64(base64::encode(mint.to_bytes())))),
+                    RpcFilterType::Memcmp(Memcmp::new(
+                        43,
+                        MemcmpEncodedBytes::Base64(base64::encode(mint.to_bytes())),
+                    )),
                 ]),
                 account_config: RpcAccountInfoConfig {
                     encoding: Some(UiAccountEncoding::Base64),
@@ -405,7 +415,7 @@ pub async fn get_pool_info(
                         }
                     }
                 }
-                
+
                 if pool_id != Pubkey::default() {
                     break;
                 } else if retry_count + 1 < max_retries {
@@ -413,28 +423,32 @@ pub async fn get_pool_info(
                 }
             }
             Err(err) => {
-                logger.log(format!("Error getting program accounts (attempt {}/{}): {}", 
-                                 retry_count + 1, max_retries, err));
+                logger.log(format!(
+                    "Error getting program accounts (attempt {}/{}): {}",
+                    retry_count + 1,
+                    max_retries,
+                    err
+                ));
             }
         }
-        
+
         retry_count += 1;
         if retry_count < max_retries {
             std::thread::sleep(std::time::Duration::from_millis(500));
         }
     }
-    
+
     if pool_id == Pubkey::default() {
         return Err(anyhow!("Failed to find Raydium pool for mint {}", mint));
     }
-    
+
     // Derive pool vault addresses using PDA
     let base_seeds = [POOL_VAULT_SEED, pool_id.as_ref(), mint.as_ref()];
     let (pool_base_account, _) = Pubkey::find_program_address(&base_seeds, &pump_program);
-    
+
     let quote_seeds = [POOL_VAULT_SEED, pool_id.as_ref(), sol_mint.as_ref()];
     let (pool_quote_account, _) = Pubkey::find_program_address(&quote_seeds, &pump_program);
-    
+
     Ok(RaydiumPool {
         pool_id,
         base_mint: mint,
@@ -456,7 +470,6 @@ fn create_buy_accounts(
     pool_quote_token_account: Pubkey,
     token_program: &Pubkey,
 ) -> Result<Vec<AccountMeta>> {
-    
     Ok(vec![
         AccountMeta::new(user, true),
         AccountMeta::new_readonly(RAYDIUM_LAUNCHPAD_AUTHORITY, false),
@@ -470,10 +483,10 @@ fn create_buy_accounts(
         AccountMeta::new_readonly(base_mint, false),
         AccountMeta::new_readonly(quote_mint, false),
         AccountMeta::new_readonly(*token_program, false), // Use detected token program for base mint
-        AccountMeta::new_readonly(TOKEN_PROGRAM, false), // Use legacy token program for WSOL
+        AccountMeta::new_readonly(TOKEN_PROGRAM, false),  // Use legacy token program for WSOL
         AccountMeta::new_readonly(EVENT_AUTHORITY, false),
         AccountMeta::new_readonly(RAYDIUM_LAUNCHPAD_PROGRAM, false),
-        ])
+    ])
 }
 
 // Similar optimization for sell accounts
@@ -488,8 +501,6 @@ fn create_sell_accounts(
     pool_quote_token_account: Pubkey,
     token_program: &Pubkey,
 ) -> Result<Vec<AccountMeta>> {
-
-
     Ok(vec![
         AccountMeta::new(user, true),
         AccountMeta::new_readonly(RAYDIUM_LAUNCHPAD_AUTHORITY, false),
@@ -503,43 +514,43 @@ fn create_sell_accounts(
         AccountMeta::new_readonly(base_mint, false),
         AccountMeta::new_readonly(quote_mint, false),
         AccountMeta::new_readonly(*token_program, false), // Use detected token program for base mint
-        AccountMeta::new_readonly(TOKEN_PROGRAM, false), // Use legacy token program for WSOL
+        AccountMeta::new_readonly(TOKEN_PROGRAM, false),  // Use legacy token program for WSOL
         AccountMeta::new_readonly(EVENT_AUTHORITY, false),
         AccountMeta::new_readonly(RAYDIUM_LAUNCHPAD_PROGRAM, false),
-])
+    ])
 }
 
 #[inline]
 fn calculate_raydium_sell_amount_out(
     base_amount_in: u64,
-    virtual_base_reserve: u64, 
+    virtual_base_reserve: u64,
     virtual_quote_reserve: u64,
     real_base_reserve: u64,
-    real_quote_reserve: u64
+    real_quote_reserve: u64,
 ) -> u64 {
     if base_amount_in == 0 || virtual_base_reserve == 0 || virtual_quote_reserve == 0 {
         return 0;
     }
-    
+
     // Raydium Launchpad constant product formula for selling:
-    // input_reserve = virtual_base - real_base  
+    // input_reserve = virtual_base - real_base
     // output_reserve = virtual_quote + real_quote
     // amount_out = (amount_in * output_reserve) / (input_reserve + amount_in)
-    
+
     let input_reserve = virtual_base_reserve.saturating_sub(real_base_reserve);
     let output_reserve = virtual_quote_reserve.saturating_add(real_quote_reserve);
-    
+
     if input_reserve == 0 || input_reserve > virtual_base_reserve {
         return 0;
     }
-    
+
     let numerator = (base_amount_in as u128).saturating_mul(output_reserve as u128);
     let denominator = (input_reserve as u128).saturating_add(base_amount_in as u128);
-    
+
     if denominator == 0 {
         return 0;
     }
-    
+
     numerator.checked_div(denominator).unwrap_or(0) as u64
 }
 
@@ -557,6 +568,10 @@ fn create_swap_instruction(
     data.extend_from_slice(&amount_in.to_le_bytes());
     data.extend_from_slice(&minimum_amount_out.to_le_bytes());
     data.extend_from_slice(&share_fee_rate.to_le_bytes());
-    
-    Instruction { program_id, accounts, data }
+
+    Instruction {
+        program_id,
+        accounts,
+        data,
+    }
 }

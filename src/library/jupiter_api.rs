@@ -1,15 +1,15 @@
-use std::sync::Arc;
-use std::str::FromStr;
+use anchor_client::solana_client::nonblocking::rpc_client::RpcClient;
+use anchor_client::solana_sdk::{
+    pubkey::Pubkey,
+    signature::{Keypair, Signer}, // Add Signer trait import
+    transaction::VersionedTransaction,
+};
 use anyhow::{anyhow, Result};
 use colored::Colorize;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
-use anchor_client::solana_sdk::{
-    signature::{Keypair, Signer}, // Add Signer trait import
-    pubkey::Pubkey,
-    transaction::VersionedTransaction,
-};
-use anchor_client::solana_client::nonblocking::rpc_client::RpcClient;
+use std::str::FromStr;
+use std::sync::Arc;
 use tokio::time::Duration;
 
 use crate::common::logger::Logger;
@@ -135,7 +135,7 @@ impl JupiterClient {
             .timeout(Duration::from_secs(30))
             .build()
             .expect("Failed to create HTTP client");
-            
+
         Self {
             client,
             rpc_client,
@@ -151,8 +151,10 @@ impl JupiterClient {
         amount: u64,
         slippage_bps: u64,
     ) -> Result<QuoteResponse> {
-        self.logger.log(format!("Getting Jupiter quote: {} -> {} (amount: {}, slippage: {}bps)", 
-            input_mint, output_mint, amount, slippage_bps));
+        self.logger.log(format!(
+            "Getting Jupiter quote: {} -> {} (amount: {}, slippage: {}bps)",
+            input_mint, output_mint, amount, slippage_bps
+        ));
 
         let quote_request = QuoteRequest {
             input_mint: input_mint.to_string(),
@@ -162,7 +164,8 @@ impl JupiterClient {
         };
 
         let url = format!("{}/quote", JUPITER_API_URL);
-        let response = self.client
+        let response = self
+            .client
             .get(&url)
             .query(&[
                 ("inputMint", &quote_request.input_mint),
@@ -174,19 +177,32 @@ impl JupiterClient {
             .await?;
 
         if !response.status().is_success() {
-            let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
             return Err(anyhow!("Jupiter quote API error: {}", error_text));
         }
 
         // Log the raw response for debugging
         let response_text = response.text().await?;
-        self.logger.log(format!("Raw quote response: {}", &response_text[..std::cmp::min(500, response_text.len())]));
-        
-        let quote: QuoteResponse = serde_json::from_str(&response_text)
-            .map_err(|e| anyhow!("Failed to parse quote response: {}. Response: {}", e, &response_text[..std::cmp::min(200, response_text.len())]))?;
-        
-        self.logger.log(format!("Jupiter quote received: {} {} -> {} {} (price impact: {}%)", 
-            quote.in_amount, input_mint, quote.out_amount, output_mint, quote.price_impact_pct));
+        self.logger.log(format!(
+            "Raw quote response: {}",
+            &response_text[..std::cmp::min(500, response_text.len())]
+        ));
+
+        let quote: QuoteResponse = serde_json::from_str(&response_text).map_err(|e| {
+            anyhow!(
+                "Failed to parse quote response: {}. Response: {}",
+                e,
+                &response_text[..std::cmp::min(200, response_text.len())]
+            )
+        })?;
+
+        self.logger.log(format!(
+            "Jupiter quote received: {} {} -> {} {} (price impact: {}%)",
+            quote.in_amount, input_mint, quote.out_amount, output_mint, quote.price_impact_pct
+        ));
 
         Ok(quote)
     }
@@ -197,7 +213,10 @@ impl JupiterClient {
         quote: QuoteResponse,
         user_public_key: &Pubkey,
     ) -> Result<VersionedTransaction> {
-        self.logger.log(format!("Getting Jupiter swap transaction for user: {}", user_public_key));
+        self.logger.log(format!(
+            "Getting Jupiter swap transaction for user: {}",
+            user_public_key
+        ));
 
         let swap_request = SwapRequest {
             quote_response: quote,
@@ -213,31 +232,46 @@ impl JupiterClient {
         };
 
         let url = format!("{}/swap", JUPITER_SWAP_API_URL);
-        
+
         // Log the request for debugging
         self.logger.log(format!("Sending swap request to: {}", url));
-        self.logger.log(format!("Request payload: {}", serde_json::to_string_pretty(&swap_request).unwrap_or_else(|_| "Failed to serialize".to_string())));
-        
-        let response = self.client
-            .post(&url)
-            .json(&swap_request)
-            .send()
-            .await?;
+        self.logger.log(format!(
+            "Request payload: {}",
+            serde_json::to_string_pretty(&swap_request)
+                .unwrap_or_else(|_| "Failed to serialize".to_string())
+        ));
+
+        let response = self.client.post(&url).json(&swap_request).send().await?;
 
         if !response.status().is_success() {
             let status = response.status();
-            let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
-            self.logger.log(format!("Jupiter swap API error: Status {}, Response: {}", status, error_text).red().to_string());
-            return Err(anyhow!("Swap API returned status: {} - {}", status, error_text));
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+            self.logger.log(
+                format!(
+                    "Jupiter swap API error: Status {}, Response: {}",
+                    status, error_text
+                )
+                .red()
+                .to_string(),
+            );
+            return Err(anyhow!(
+                "Swap API returned status: {} - {}",
+                status,
+                error_text
+            ));
         }
 
         let swap_response: SwapResponse = response.json().await?;
-        
+
         // Decode the base64 transaction
         let transaction_bytes = base64::decode(&swap_response.swap_transaction)?;
         let transaction: VersionedTransaction = bincode::deserialize(&transaction_bytes)?;
 
-        self.logger.log("Jupiter swap transaction received and decoded successfully".to_string());
+        self.logger
+            .log("Jupiter swap transaction received and decoded successfully".to_string());
 
         Ok(transaction)
     }
@@ -250,20 +284,20 @@ impl JupiterClient {
         slippage_bps: u64,
         keypair: &Keypair,
     ) -> Result<String> {
-        self.logger.log(format!("Starting Jupiter sell for token {} (amount: {}, slippage: {}bps)", 
-            token_mint, token_amount, slippage_bps));
+        self.logger.log(format!(
+            "Starting Jupiter sell for token {} (amount: {}, slippage: {}bps)",
+            token_mint, token_amount, slippage_bps
+        ));
 
         // Get quote
         self.logger.log("Getting Jupiter quote...".to_string());
-        let quote = self.get_quote(
-            token_mint,
-            SOL_MINT,
-            token_amount,
-            slippage_bps,
-        ).await?;
+        let quote = self
+            .get_quote(token_mint, SOL_MINT, token_amount, slippage_bps)
+            .await?;
 
-        self.logger.log(format!("Quote received, getting swap transaction..."));
-        
+        self.logger
+            .log(format!("Quote received, getting swap transaction..."));
+
         // Get swap transaction
         let mut transaction = self.get_swap_transaction(quote, &keypair.pubkey()).await?;
 
@@ -275,13 +309,16 @@ impl JupiterClient {
         use anchor_client::solana_sdk::signer::Signer;
         let message_data = transaction.message.serialize();
         let signature = keypair.sign_message(&message_data);
-        
+
         // Find the position of the keypair in the account keys to place the signature
         let account_keys = transaction.message.static_account_keys();
         if let Some(signer_index) = account_keys.iter().position(|key| *key == keypair.pubkey()) {
             // Ensure we have enough signatures
             if transaction.signatures.len() <= signer_index {
-                transaction.signatures.resize(signer_index + 1, anchor_client::solana_sdk::signature::Signature::default());
+                transaction.signatures.resize(
+                    signer_index + 1,
+                    anchor_client::solana_sdk::signature::Signature::default(),
+                );
             }
             transaction.signatures[signer_index] = signature;
         } else {
@@ -291,7 +328,11 @@ impl JupiterClient {
         // Send the transaction
         let signature = self.rpc_client.send_transaction(&transaction).await?;
 
-        self.logger.log(format!("Jupiter sell transaction sent: {}", signature).green().to_string());
+        self.logger.log(
+            format!("Jupiter sell transaction sent: {}", signature)
+                .green()
+                .to_string(),
+        );
 
         Ok(signature.to_string())
     }
@@ -299,30 +340,40 @@ impl JupiterClient {
     /// Verify if a transaction was successful
     pub async fn verify_transaction(&self, signature: &str) -> Result<bool> {
         let signature = anchor_client::solana_sdk::signature::Signature::from_str(signature)?;
-        
+
         // Wait a bit for transaction to settle
         tokio::time::sleep(Duration::from_secs(2)).await;
 
         match self.rpc_client.get_signature_status(&signature).await? {
-            Some(result) => {
-                match result {
-                    Ok(_) => {
-                        self.logger.log(format!("Transaction {} confirmed successfully", signature).green().to_string());
-                        Ok(true)
-                    },
-                    Err(e) => {
-                        self.logger.log(format!("Transaction {} failed: {:?}", signature, e).red().to_string());
-                        Ok(false)
-                    }
+            Some(result) => match result {
+                Ok(_) => {
+                    self.logger.log(
+                        format!("Transaction {} confirmed successfully", signature)
+                            .green()
+                            .to_string(),
+                    );
+                    Ok(true)
+                }
+                Err(e) => {
+                    self.logger.log(
+                        format!("Transaction {} failed: {:?}", signature, e)
+                            .red()
+                            .to_string(),
+                    );
+                    Ok(false)
                 }
             },
             None => {
-                self.logger.log(format!("Transaction {} not found or still pending", signature).yellow().to_string());
+                self.logger.log(
+                    format!("Transaction {} not found or still pending", signature)
+                        .yellow()
+                        .to_string(),
+                );
                 Ok(false)
             }
         }
     }
-    
+
     /// High-level function to sell a token using Jupiter API
     pub async fn sell_token(
         &self,
@@ -330,38 +381,53 @@ impl JupiterClient {
         amount: u64,
         slippage_bps: u64,
         user_public_key: &Pubkey,
-    ) -> Result<(String, f64)> { // Returns (signature, expected_sol_amount)
+    ) -> Result<(String, f64)> {
+        // Returns (signature, expected_sol_amount)
         let sol_mint = "So11111111111111111111111111111111111111112";
-        
+
         // Skip if it's already SOL
         if input_mint == sol_mint {
             return Ok(("skip".to_string(), 0.0));
         }
-        
+
         // Get quote
-        let quote = self.get_quote(input_mint, sol_mint, amount, slippage_bps).await?;
-        
+        let quote = self
+            .get_quote(input_mint, sol_mint, amount, slippage_bps)
+            .await?;
+
         // Calculate expected SOL output
-        let expected_sol_raw = quote.out_amount.parse::<u64>()
+        let expected_sol_raw = quote
+            .out_amount
+            .parse::<u64>()
             .map_err(|e| anyhow!("Failed to parse output amount: {}", e))?;
         let expected_sol = expected_sol_raw as f64 / 1e9;
-        
+
         // Skip if expected output is too small
         if expected_sol < 0.0001 {
-            return Err(anyhow!("Expected SOL output too small: {} SOL", expected_sol));
+            return Err(anyhow!(
+                "Expected SOL output too small: {} SOL",
+                expected_sol
+            ));
         }
-        
-        self.logger.log(format!("Expected SOL output for {}: {:.6}", input_mint, expected_sol));
-        
+
+        self.logger.log(format!(
+            "Expected SOL output for {}: {:.6}",
+            input_mint, expected_sol
+        ));
+
         // Get swap transaction
         let versioned_transaction = self.get_swap_transaction(quote, user_public_key).await?;
-        
+
         // Send transaction using the RPC client
-        let signature = self.rpc_client.send_transaction(&versioned_transaction).await
+        let signature = self
+            .rpc_client
+            .send_transaction(&versioned_transaction)
+            .await
             .map_err(|e| anyhow!("Failed to send transaction: {}", e))?;
-        
-        self.logger.log(format!("Token sell transaction sent: {}", signature));
-        
+
+        self.logger
+            .log(format!("Token sell transaction sent: {}", signature));
+
         Ok((signature.to_string(), expected_sol))
     }
-} 
+}

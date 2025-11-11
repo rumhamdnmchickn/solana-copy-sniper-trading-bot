@@ -1,19 +1,21 @@
+use crate::processor::swap::SwapProtocol;
+use crate::{
+    common::{constants::INIT_MSG, logger::Logger},
+    processor::swap::{SwapDirection, SwapInType},
+};
+use anchor_client::solana_sdk::{
+    commitment_config::CommitmentConfig, signature::Keypair, signer::Signer,
+};
 use anyhow::Result;
 use bs58;
 use colored::Colorize;
 use dotenv::dotenv;
 use reqwest::Error;
 use serde::Deserialize;
-use anchor_client::solana_sdk::{commitment_config::CommitmentConfig, signature::Keypair, signer::Signer};
+use std::time::Duration;
+use std::{env, sync::Arc};
 use tokio::sync::{Mutex, OnceCell};
 use tokio_tungstenite::tungstenite::http::request;
-use std::{env, sync::Arc};
-use crate::processor::swap::SwapProtocol;
-use crate::{
-    common::{constants::INIT_MSG, logger::Logger},
-    processor::swap::{SwapDirection, SwapInType},
-};
-use std::time::Duration;
 
 static GLOBAL_CONFIG: OnceCell<Mutex<Config>> = OnceCell::const_new();
 
@@ -31,12 +33,15 @@ impl Default for TransactionLandingMode {
 
 impl FromStr for TransactionLandingMode {
     type Err = String;
-    
+
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "0" | "zeroslot" => Ok(TransactionLandingMode::Zeroslot),
             "1" | "normal" => Ok(TransactionLandingMode::Normal),
-            _ => Err(format!("Invalid transaction landing mode: {}. Use 'zeroslot' or 'normal'", s)),
+            _ => Err(format!(
+                "Invalid transaction landing mode: {}. Use 'zeroslot' or 'normal'",
+                s
+            )),
         }
     }
 }
@@ -50,7 +55,7 @@ pub struct Config {
     pub swap_config: SwapConfig,
     pub counter_limit: u32,
     pub transaction_landing_mode: TransactionLandingMode,
-    pub copy_selling_limit: f64, // Add this field
+    pub copy_selling_limit: f64,  // Add this field
     pub selling_unit_price: u64,  // New: Priority fee for selling transactions
     pub selling_unit_limit: u32,  // New: Compute units for selling transactions
     pub zero_slot_tip_value: f64, // New: Tip value for zeroslot selling
@@ -63,108 +68,125 @@ impl Config {
     pub async fn new() -> &'static Mutex<Config> {
         GLOBAL_CONFIG
             .get_or_init(|| async {
-            let init_msg = INIT_MSG;
-            println!("{}", init_msg);
+                let init_msg = INIT_MSG;
+                println!("{}", init_msg);
 
-            dotenv().ok(); // Load .env file
+                dotenv().ok(); // Load .env file
 
-            let logger = Logger::new("[INIT] => ".blue().bold().to_string());
+                let logger = Logger::new("[INIT] => ".blue().bold().to_string());
 
-            let yellowstone_grpc_http = import_env_var("YELLOWSTONE_GRPC_HTTP");
-            let yellowstone_grpc_token = import_env_var("YELLOWSTONE_GRPC_TOKEN");
-            let slippage_input = import_env_var("SLIPPAGE").parse::<u64>().unwrap_or(5000);
-            let counter_limit = import_env_var("COUNTER_LIMIT").parse::<u32>().unwrap_or(0_u32);
-            let transaction_landing_mode = import_env_var("TRANSACTION_LANDING_SERVICE")
-                .parse::<TransactionLandingMode>()
-                .unwrap_or(TransactionLandingMode::default());
-            // Read COPY_SELLING_LIMIT from env (default 1.5)
-            let copy_selling_limit = import_env_var("COPY_SELLING_LIMIT").parse::<f64>().unwrap_or(1.5);
-            
-            // Read selling configuration for front-running
-            let selling_unit_price = import_env_var("SELLING_UNIT_PRICE").parse::<u64>().unwrap_or(4000000);
-            let selling_unit_limit = import_env_var("SELLING_UNIT_LIMIT").parse::<u32>().unwrap_or(2000000);
-            let zero_slot_tip_value = import_env_var("ZERO_SLOT_TIP_VALUE").parse::<f64>().unwrap_or(0.0025);
-            // Sniper thresholds
-            let focus_drop_threshold_pct = import_env_var("FOCUS_DROP_THRESHOLD_PCT").parse::<f64>().unwrap_or(0.15);
-            let focus_trigger_sol = import_env_var("FOCUS_TRIGGER_SOL").parse::<f64>().unwrap_or(1.0);
-            
-            let max_slippage: u64 = 10000 ; 
-            let slippage = if slippage_input > max_slippage {
-                max_slippage
-            } else {
-                slippage_input
-            };
-            let solana_price = create_coingecko_proxy().await.unwrap_or(200_f64);
-            let rpc_client = create_rpc_client().unwrap();
-            let rpc_nonblocking_client = create_nonblocking_rpc_client().await.unwrap();
-            let zeroslot_rpc_client = create_zeroslot_rpc_client().await.unwrap();
-            let wallet: std::sync::Arc<anchor_client::solana_sdk::signature::Keypair> = import_wallet().unwrap();
-            let balance = match rpc_nonblocking_client
-                .get_account(&wallet.pubkey())
-                .await {
+                let yellowstone_grpc_http = import_env_var("YELLOWSTONE_GRPC_HTTP");
+                let yellowstone_grpc_token = import_env_var("YELLOWSTONE_GRPC_TOKEN");
+                let slippage_input = import_env_var("SLIPPAGE").parse::<u64>().unwrap_or(5000);
+                let counter_limit = import_env_var("COUNTER_LIMIT")
+                    .parse::<u32>()
+                    .unwrap_or(0_u32);
+                let transaction_landing_mode = import_env_var("TRANSACTION_LANDING_SERVICE")
+                    .parse::<TransactionLandingMode>()
+                    .unwrap_or(TransactionLandingMode::default());
+                // Read COPY_SELLING_LIMIT from env (default 1.5)
+                let copy_selling_limit = import_env_var("COPY_SELLING_LIMIT")
+                    .parse::<f64>()
+                    .unwrap_or(1.5);
+
+                // Read selling configuration for front-running
+                let selling_unit_price = import_env_var("SELLING_UNIT_PRICE")
+                    .parse::<u64>()
+                    .unwrap_or(4000000);
+                let selling_unit_limit = import_env_var("SELLING_UNIT_LIMIT")
+                    .parse::<u32>()
+                    .unwrap_or(2000000);
+                let zero_slot_tip_value = import_env_var("ZERO_SLOT_TIP_VALUE")
+                    .parse::<f64>()
+                    .unwrap_or(0.0025);
+                // Sniper thresholds
+                let focus_drop_threshold_pct = import_env_var("FOCUS_DROP_THRESHOLD_PCT")
+                    .parse::<f64>()
+                    .unwrap_or(0.15);
+                let focus_trigger_sol = import_env_var("FOCUS_TRIGGER_SOL")
+                    .parse::<f64>()
+                    .unwrap_or(1.0);
+
+                let max_slippage: u64 = 10000;
+                let slippage = if slippage_input > max_slippage {
+                    max_slippage
+                } else {
+                    slippage_input
+                };
+                let solana_price = create_coingecko_proxy().await.unwrap_or(200_f64);
+                let rpc_client = create_rpc_client().unwrap();
+                let rpc_nonblocking_client = create_nonblocking_rpc_client().await.unwrap();
+                let zeroslot_rpc_client = create_zeroslot_rpc_client().await.unwrap();
+                let wallet: std::sync::Arc<anchor_client::solana_sdk::signature::Keypair> =
+                    import_wallet().unwrap();
+                let balance = match rpc_nonblocking_client.get_account(&wallet.pubkey()).await {
                     Ok(account) => account.lamports,
                     Err(err) => {
-                        logger.log(format!("Failed to get wallet balance: {}", err).red().to_string());
+                        logger.log(
+                            format!("Failed to get wallet balance: {}", err)
+                                .red()
+                                .to_string(),
+                        );
                         0 // Default to zero if we can't get the balance
                     }
                 };
 
-            let wallet_cloned = wallet.clone();
-            let swap_direction = SwapDirection::Buy; //SwapDirection::Sell
-            let in_type = SwapInType::Qty; //SwapInType::Pct
-            let amount_in = import_env_var("TOKEN_AMOUNT")
-                .parse::<f64>()
-                .unwrap_or(0.001_f64); //quantity
-                                        // let in_type = "pct"; //percentage
-                                        // let amount_in = 0.5; //percentage
+                let wallet_cloned = wallet.clone();
+                let swap_direction = SwapDirection::Buy; //SwapDirection::Sell
+                let in_type = SwapInType::Qty; //SwapInType::Pct
+                let amount_in = import_env_var("TOKEN_AMOUNT")
+                    .parse::<f64>()
+                    .unwrap_or(0.001_f64); //quantity
+                                           // let in_type = "pct"; //percentage
+                                           // let amount_in = 0.5; //percentage
 
-            let swap_config = SwapConfig {
-                swap_direction,
-                in_type,
-                amount_in,
-                slippage,
-            };
+                let swap_config = SwapConfig {
+                    swap_direction,
+                    in_type,
+                    amount_in,
+                    slippage,
+                };
 
-            let rpc_client = create_rpc_client().unwrap();
-            let app_state = AppState {
-                rpc_client,
-                rpc_nonblocking_client,
-                zeroslot_rpc_client,
-                wallet,
-                protocol_preference: SwapProtocol::default(),
-            };
-           logger.log(
+                let rpc_client = create_rpc_client().unwrap();
+                let app_state = AppState {
+                    rpc_client,
+                    rpc_nonblocking_client,
+                    zeroslot_rpc_client,
+                    wallet,
+                    protocol_preference: SwapProtocol::default(),
+                };
+                logger.log(
                     format!(
-                    "[SNIPER ENVIRONMENT]: \n\t\t\t\t [Yellowstone gRpc]: {},
+                        "[SNIPER ENVIRONMENT]: \n\t\t\t\t [Yellowstone gRpc]: {},
                     \n\t\t\t\t * [Wallet]: {:?}, * [Balance]: {} Sol, 
                     \n\t\t\t\t * [Slippage]: {}, * [Solana]: {}, * [Amount]: {}",
+                        yellowstone_grpc_http,
+                        wallet_cloned.pubkey(),
+                        balance as f64 / 1_000_000_000_f64,
+                        slippage_input,
+                        solana_price,
+                        amount_in,
+                    )
+                    .purple()
+                    .italic()
+                    .to_string(),
+                );
+                Mutex::new(Config {
                     yellowstone_grpc_http,
-                    wallet_cloned.pubkey(),
-                    balance as f64 / 1_000_000_000_f64,
-                    slippage_input,
-                    solana_price,
-                    amount_in,
-                )
-                .purple()
-                .italic()
-                .to_string(),
-            );
-            Mutex::new(Config {
-                yellowstone_grpc_http,
-                yellowstone_grpc_token,
-                app_state,
-                swap_config,
-                counter_limit,
-                transaction_landing_mode,
-                copy_selling_limit, // Set the field
-                selling_unit_price,
-                selling_unit_limit,
-                zero_slot_tip_value,
-                focus_drop_threshold_pct,
-                focus_trigger_sol,
+                    yellowstone_grpc_token,
+                    app_state,
+                    swap_config,
+                    counter_limit,
+                    transaction_landing_mode,
+                    copy_selling_limit, // Set the field
+                    selling_unit_price,
+                    selling_unit_limit,
+                    zero_slot_tip_value,
+                    focus_drop_threshold_pct,
+                    focus_trigger_sol,
+                })
             })
-        })
-        .await
+            .await
     }
     pub async fn get() -> tokio::sync::MutexGuard<'static, Config> {
         GLOBAL_CONFIG
@@ -196,7 +218,6 @@ pub const RAYDIUM_LAUNCHPAD_PROGRAM_DATA_PREFIX: &str = "Program data: G3KpTd7rY
 pub const RAYDIUM_LAUNCHPAD_BUY_LOG_INSTRUCTION: &str = "Buy";
 pub const RAYDIUM_LAUNCHPAD_BUY_OR_SELL_PROGRAM_DATA_PREFIX: &str = "Program data: vdt/007mYe";
 pub const RAYDIUM_LAUNCHPAD_SELL_LOG_INSTRUCTION: &str = "Sell";
-
 
 use std::cmp::Eq;
 use std::hash::{Hash, Hasher};
@@ -242,7 +263,8 @@ struct SolanaData {
 #[derive(Clone)]
 pub struct AppState {
     pub rpc_client: Arc<anchor_client::solana_client::rpc_client::RpcClient>,
-    pub rpc_nonblocking_client: Arc<anchor_client::solana_client::nonblocking::rpc_client::RpcClient>,
+    pub rpc_nonblocking_client:
+        Arc<anchor_client::solana_client::nonblocking::rpc_client::RpcClient>,
     pub zeroslot_rpc_client: Arc<crate::library::zeroslot::ZeroSlotClient>,
     pub wallet: Arc<Keypair>,
     pub protocol_preference: SwapProtocol,
@@ -257,11 +279,11 @@ pub struct SwapConfig {
 }
 
 pub fn import_env_var(key: &str) -> String {
-    match env::var(key){
+    match env::var(key) {
         Ok(res) => res,
         Err(e) => {
             println!("{}", format!("{}: {}", e, key).red().to_string());
-            loop{}
+            loop {}
         }
     }
 }
@@ -277,11 +299,12 @@ pub fn get_zero_slot_health_url() -> String {
 pub fn create_rpc_client() -> Result<Arc<anchor_client::solana_client::rpc_client::RpcClient>> {
     let rpc_http = import_env_var("RPC_HTTP");
     let timeout = Duration::from_secs(30); // 30 second timeout
-    let rpc_client = anchor_client::solana_client::rpc_client::RpcClient::new_with_timeout_and_commitment(
-        rpc_http,
-        timeout,
-        CommitmentConfig::processed(),
-    );
+    let rpc_client =
+        anchor_client::solana_client::rpc_client::RpcClient::new_with_timeout_and_commitment(
+            rpc_http,
+            timeout,
+            CommitmentConfig::processed(),
+        );
     Ok(Arc::new(rpc_client))
 }
 
@@ -299,15 +322,12 @@ pub async fn create_nonblocking_rpc_client(
 
 pub async fn create_zeroslot_rpc_client() -> Result<Arc<crate::library::zeroslot::ZeroSlotClient>> {
     let client = crate::library::zeroslot::ZeroSlotClient::new(
-        crate::library::zeroslot::ZERO_SLOT_URL.as_str()
+        crate::library::zeroslot::ZERO_SLOT_URL.as_str(),
     );
     Ok(Arc::new(client))
 }
 
-
 pub async fn create_coingecko_proxy() -> Result<f64, Error> {
-    
-
     let url = "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd";
 
     let response = reqwest::get(url).await?;
@@ -321,8 +341,16 @@ pub async fn create_coingecko_proxy() -> Result<f64, Error> {
 pub fn import_wallet() -> Result<Arc<Keypair>> {
     let priv_key = import_env_var("PRIVATE_KEY");
     if priv_key.len() < 85 {
-        println!("{}", format!("Please check wallet priv key: Invalid length => {}", priv_key.len()).red().to_string());
-        loop{}
+        println!(
+            "{}",
+            format!(
+                "Please check wallet priv key: Invalid length => {}",
+                priv_key.len()
+            )
+            .red()
+            .to_string()
+        );
+        loop {}
     }
     let wallet: Keypair = Keypair::from_base58_string(priv_key.as_str());
 

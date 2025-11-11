@@ -1,5 +1,10 @@
-use anchor_client::solana_sdk::{pubkey::Pubkey, signature::Keypair, signer::Signer, instruction::Instruction, rent::Rent, system_instruction};
+use anchor_client::solana_sdk::{
+    instruction::Instruction, pubkey::Pubkey, rent::Rent, signature::Keypair, signer::Signer,
+    system_instruction,
+};
+use anyhow::{anyhow, Result};
 use solana_program_pack::Pack;
+use spl_associated_token_account::instruction::create_associated_token_account_idempotent;
 use spl_token_2022::{
     extension::StateWithExtensionsOwned,
     state::{Account, Mint},
@@ -9,8 +14,6 @@ use spl_token_client::{
     token::{Token, TokenError, TokenResult},
 };
 use std::sync::Arc;
-use anyhow::{Result, anyhow};
-use spl_associated_token_account::instruction::create_associated_token_account_idempotent;
 
 use crate::common::cache::{TOKEN_ACCOUNT_CACHE, TOKEN_MINT_CACHE};
 
@@ -125,27 +128,36 @@ pub async fn account_exists(
     if TOKEN_ACCOUNT_CACHE.get(account).is_some() {
         return Ok(true);
     }
-    
+
     // Just check if the account exists without validating the mint
-    match rpc_client.get_account_with_commitment(account, rpc_client.commitment()).await {
+    match rpc_client
+        .get_account_with_commitment(account, rpc_client.commitment())
+        .await
+    {
         Ok(response) => {
             match response.value {
                 Some(acc) => {
                     // Check if the account is owned by the token program
                     if acc.owner == spl_token::ID {
                         // Try to parse the account to cache it for future use
-                        if let Ok(token_account) = StateWithExtensionsOwned::<Account>::unpack(acc.data.clone()) {
+                        if let Ok(token_account) =
+                            StateWithExtensionsOwned::<Account>::unpack(acc.data.clone())
+                        {
                             TOKEN_ACCOUNT_CACHE.insert(*account, token_account, None);
                         }
                         Ok(true)
                     } else {
                         Ok(false)
                     }
-                },
+                }
                 None => Ok(false),
             }
-        },
-        Err(e) => Err(anyhow!("Error checking account: {}, account: {}", e, account)),
+        }
+        Err(e) => Err(anyhow!(
+            "Error checking account: {}, account: {}",
+            e,
+            account
+        )),
     }
 }
 
@@ -159,13 +171,17 @@ pub async fn verify_token_account(
     if let Some(cached_account) = TOKEN_ACCOUNT_CACHE.get(account) {
         return Ok(cached_account.base.mint == *mint);
     }
-    
+
     match get_account_info(rpc_client, *mint, *account).await {
         Ok(_) => Ok(true),
         Err(TokenError::AccountNotFound) => Ok(false),
         Err(TokenError::AccountInvalidMint) => Ok(false),
         Err(TokenError::AccountInvalidOwner) => Ok(false),
-        Err(e) => Err(anyhow!("Error checking account: {} , account: {}", e, account)),
+        Err(e) => Err(anyhow!(
+            "Error checking account: {} , account: {}",
+            e,
+            account
+        )),
     }
 }
 
@@ -177,7 +193,7 @@ pub async fn get_multiple_token_accounts(
     let mut result = Vec::with_capacity(accounts.len());
     let mut accounts_to_fetch = Vec::new();
     let mut indices = Vec::new();
-    
+
     // Check cache first
     for (i, account) in accounts.iter().enumerate() {
         if let Some(cached_account) = TOKEN_ACCOUNT_CACHE.get(account) {
@@ -188,24 +204,30 @@ pub async fn get_multiple_token_accounts(
             indices.push(i);
         }
     }
-    
+
     if !accounts_to_fetch.is_empty() {
         // Fetch accounts not in cache
         let fetched_accounts = rpc_client.get_multiple_accounts(&accounts_to_fetch).await?;
-        
+
         for (i, maybe_account) in fetched_accounts.iter().enumerate() {
             if let Some(account_data) = maybe_account {
                 if account_data.owner == spl_token::ID {
-                    if let Ok(token_account) = StateWithExtensionsOwned::<Account>::unpack(account_data.data.clone()) {
+                    if let Ok(token_account) =
+                        StateWithExtensionsOwned::<Account>::unpack(account_data.data.clone())
+                    {
                         // Cache the account
-                        TOKEN_ACCOUNT_CACHE.insert(accounts_to_fetch[i], token_account.clone(), None);
+                        TOKEN_ACCOUNT_CACHE.insert(
+                            accounts_to_fetch[i],
+                            token_account.clone(),
+                            None,
+                        );
                         result[indices[i]] = Some(token_account);
                     }
                 }
             }
         }
     }
-    
+
     Ok(result)
 }
 
@@ -216,7 +238,7 @@ pub fn create_wsol_account_with_amount(
 ) -> Result<(Pubkey, Vec<Instruction>), anyhow::Error> {
     let wsol_account = Keypair::new();
     let wsol_account_pubkey = wsol_account.pubkey();
-    
+
     let instructions = vec![
         // Create account
         system_instruction::create_account(
@@ -234,32 +256,28 @@ pub fn create_wsol_account_with_amount(
             &owner,
         )?,
     ];
-    
+
     Ok((wsol_account_pubkey, instructions))
 }
 
 /// Create a wrapped SOL account (without funding)
-pub fn create_wsol_account(
-    owner: Pubkey,
-) -> Result<(Pubkey, Vec<Instruction>), anyhow::Error> {
+pub fn create_wsol_account(owner: Pubkey) -> Result<(Pubkey, Vec<Instruction>), anyhow::Error> {
     let mut instructions = Vec::new();
-    
+
     // Create the associated token account for WSOL
-    instructions.push(
-        create_associated_token_account_idempotent(
-            &owner,
-            &owner,
-            &spl_token::native_mint::id(),
-            &spl_token::ID,
-        )
-    );
-    
+    instructions.push(create_associated_token_account_idempotent(
+        &owner,
+        &owner,
+        &spl_token::native_mint::id(),
+        &spl_token::ID,
+    ));
+
     // Get the WSOL ATA address using the SPL token function directly
     let wsol_account = spl_associated_token_account::get_associated_token_address(
         &owner,
-        &spl_token::native_mint::id()
+        &spl_token::native_mint::id(),
     );
-    
+
     Ok((wsol_account, instructions))
 }
 

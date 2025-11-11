@@ -17,11 +17,11 @@
 //! - `SimulationError`: Transaction simulation failed.
 //! - `RateLimitExceeded`: Rate limit exceeded.
 
-use serde_json::Error;
 use anchor_client::solana_client::{
     client_error::ClientError as SolanaClientError, pubsub_client::PubsubClientError,
 };
 use anchor_client::solana_sdk::pubkey::ParsePubkeyError;
+use serde_json::Error;
 
 // #[derive(Debug)]
 // #[allow(dead_code)]
