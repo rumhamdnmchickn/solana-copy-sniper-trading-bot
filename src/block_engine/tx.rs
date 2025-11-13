@@ -1,27 +1,34 @@
+use reqwest::Client;
+use std::time::Instant;
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
 use crate::{
-    common::{config::TransactionLandingMode, logger::Logger},
+    common::{logger::Logger},
     library::zeroslot::{self, ZeroSlotClient},
 };
-use anchor_client::solana_client::nonblocking::rpc_client::RpcClient;
-use anchor_client::solana_sdk::pubkey::Pubkey;
+// use anchor_client::solana_client::nonblocking::rpc_client::RpcClient; // unused now
+// use anchor_client::solana_sdk::pubkey::Pubkey; // unused now
 use anchor_client::solana_sdk::{
     instruction::Instruction, signature::Keypair, system_instruction, transaction::Transaction,
 };
 use anyhow::{anyhow, Result};
-use base64;
-use bs58;
+// use base64; // unused now
+// use bs58; // unused now
 use colored::Colorize;
-use dotenv::dotenv;
+// use dotenv::dotenv; // unused now
 use once_cell::sync::Lazy;
-use reqwest::{Client, ClientBuilder};
+#[cfg(feature = "zeroslot")]
+#[cfg(feature="zeroslot")] use reqwest::{Client, ClientBuilder};
 use solana_sdk::signature::Signer;
-use spl_token::ui_amount_to_amount;
+// use spl_token::ui_amount_to_amount; // unused now
 use std::env;
 use std::str::FromStr;
 use std::sync::Arc;
-use std::time::Duration;
-use tokio::sync::Mutex;
-use tokio::time::{sleep, Instant};
+#[cfg(feature = "zeroslot")]
+#[cfg(feature="zeroslot")] use std::time::Duration;
+// use tokio::sync::Mutex; // unused now
+#[cfg(feature = "zeroslot")]
+#[cfg(feature="zeroslot")] use tokio::time::{sleep, Instant};
 
 // prioritization fee = UNIT_PRICE * UNIT_LIMIT
 fn get_unit_price() -> u64 {
@@ -39,7 +46,7 @@ fn get_unit_limit() -> u32 {
 }
 
 // Cache the FlashBlock API key
-static FLASHBLOCK_API_KEY: Lazy<String> = Lazy::new(|| {
+#[cfg(feature="zeroslot")] static FLASHBLOCK_API_KEY: Lazy<String> = Lazy::new(|| {
     std::env::var("FLASHBLOCK_API_KEY")
         .ok()
         .unwrap_or_else(|| "da07907679634859".to_string())
@@ -50,12 +57,12 @@ static HTTP_CLIENT: Lazy<Client> = Lazy::new(|| {
     let client = reqwest::Client::new();
     client
 });
-
+#[cfg(feature = "zeroslot")]
 pub async fn new_signed_and_send_zeroslot(
     zeroslot_rpc_client: Arc<crate::library::zeroslot::ZeroSlotClient>,
     recent_blockhash: solana_sdk::hash::Hash,
     keypair: &Keypair,
-    mut instructions: Vec<Instruction>,
+     instructions: Vec<Instruction>,
     logger: &Logger,
 ) -> Result<Vec<String>> {
     let tip_account = zeroslot::get_tip_account()?;
@@ -64,10 +71,10 @@ pub async fn new_signed_and_send_zeroslot(
 
     // zeroslot tip, the upper limit is 0.1
     let tip = zeroslot::get_tip_value().await?;
-    let tip_lamports = ui_amount_to_amount(tip, spl_token::native_mint::DECIMALS);
+    let _tip_lamports = ui_amount_to_amount(tip, spl_token::native_mint::DECIMALS);
 
     let zeroslot_tip_instruction =
-        system_instruction::transfer(&keypair.pubkey(), &tip_account, tip_lamports);
+        system_instruction::transfer(&keypair.pubkey(), &tip_account, _tip_lamports);
 
     let unit_limit = get_unit_limit(); // TODO: update in mev boost
     let unit_price = get_unit_price(); // TODO: update in mev boost
@@ -106,11 +113,12 @@ pub async fn new_signed_and_send_zeroslot(
 
     Ok(txs)
 }
-
+#[cfg(feature = "zeroslot")]
+#[cfg_attr(not(feature = "execution_controls"), expect(unused_variables, reason = "planned: unit_limit/price/tip wired by execution_controls"))]
 pub async fn new_signed_and_send_zeroslot_fast(
-    compute_unit_limit: u32,
-    compute_unit_price: u64,
-    tip_lamports: u64,
+    _compute_unit_limit: u32,
+    _compute_unit_price: u64,
+    _tip_lamports: u64,
     zeroslot_rpc_client: Arc<crate::library::zeroslot::ZeroSlotClient>,
     recent_blockhash: solana_sdk::hash::Hash,
     keypair: &Keypair,
@@ -123,10 +131,10 @@ pub async fn new_signed_and_send_zeroslot_fast(
 
     // zeroslot tip, the upper limit is 0.1
     let tip = zeroslot::get_tip_value().await?;
-    let tip_lamports = ui_amount_to_amount(tip, spl_token::native_mint::DECIMALS);
+    let _tip_lamports = ui_amount_to_amount(tip, spl_token::native_mint::DECIMALS);
 
     let zeroslot_tip_instruction =
-        system_instruction::transfer(&keypair.pubkey(), &tip_account, tip_lamports);
+        system_instruction::transfer(&keypair.pubkey(), &tip_account, _tip_lamports);
 
     let unit_limit = get_unit_limit(); // TODO: update in mev boost
     let unit_price = get_unit_price(); // TODO: update in mev boost
@@ -208,6 +216,7 @@ pub async fn new_signed_and_send_normal(
 }
 
 /// Universal transaction landing function that routes to the appropriate service
+#[cfg(feature="zeroslot")]
 pub async fn new_signed_and_send_with_landing_mode(
     transaction_landing_mode: TransactionLandingMode,
     app_state: &crate::common::config::AppState,
@@ -221,7 +230,7 @@ pub async fn new_signed_and_send_with_landing_mode(
         TransactionLandingMode::Zeroslot => {
             logger.log("Using Zeroslot for transaction landing".green().to_string());
             new_signed_and_send_zeroslot(
-                app_state.zeroslot_rpc_client.clone(),
+                &app_state,
                 recent_blockhash,
                 keypair,
                 instructions,
@@ -245,4 +254,41 @@ pub async fn new_signed_and_send_with_landing_mode(
             .await
         }
     }
+}
+
+#[cfg(not(feature = "zeroslot"))]
+pub async fn new_signed_and_send_with_landing_mode(
+    _transaction_landing_mode: crate::common::config::TransactionLandingMode,
+    app_state: &crate::common::config::AppState,
+    recent_blockhash: anchor_client::solana_sdk::hash::Hash,
+    keypair: &anchor_client::solana_sdk::signature::Keypair,
+    instructions: Vec<anchor_client::solana_sdk::instruction::Instruction>,
+    logger: &crate::common::logger::Logger,
+) -> anyhow::Result<Vec<String>> {
+    logger.log("Zeroslot disabled; using normal RPC landing".to_string());
+    new_signed_and_send_normal(
+        app_state.rpc_nonblocking_client.clone(),
+        recent_blockhash,
+        keypair,
+        instructions,
+        logger,
+    ).await
+}
+
+#[cfg(not(feature = "zeroslot"))]
+pub async fn new_signed_and_send_zeroslot(
+    _app_state: &crate::common::config::AppState,
+    recent_blockhash: anchor_client::solana_sdk::hash::Hash,
+    keypair: &anchor_client::solana_sdk::signature::Keypair,
+    instructions: Vec<anchor_client::solana_sdk::instruction::Instruction>,
+    logger: &crate::common::logger::Logger,
+) -> anyhow::Result<Vec<String>> {
+    // Fallback: call normal path when zeroslot is disabled
+    new_signed_and_send_normal(
+        _app_state.rpc_nonblocking_client.clone(),
+        recent_blockhash,
+        keypair,
+        instructions,
+        logger,
+    ).await
 }

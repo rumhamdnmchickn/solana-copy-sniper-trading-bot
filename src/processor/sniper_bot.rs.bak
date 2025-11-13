@@ -253,171 +253,11 @@ lazy_static::lazy_static! {
     static ref SHOULD_CONTINUE_STREAMING: Arc<AtomicBool> = Arc::new(AtomicBool::new(true));
     // Add: Permanent blacklist for tokens that have been bought before (never rebuy)
     static ref BOUGHT_TOKENS_BLACKLIST: Arc<DashMap<String, u64>> = Arc::new(DashMap::new());
-    // Static file-based permanent blacklist loaded from blacklist.json
-    static ref PERMANENT_FILE_BLACKLIST: Arc<DashMap<String, ()>> = Arc::new(DashMap::new());
-    static ref PERMANENT_FILE_BLACKLIST_LOADED: AtomicBool = AtomicBool::new(false);
     // SNIPER BOT: Focus token list for tracking target wallet purchases
     pub static ref FOCUS_TOKEN_LIST: Arc<DashMap<String, FocusTokenInfo>> = Arc::new(DashMap::new());
     // SNIPER BOT: Price monitoring tasks for focus tokens
     static ref PRICE_MONITORING_TASKS: Arc<DashMap<String, CancellationToken>> = Arc::new(DashMap::new());
 }
-
-
-fn load_permanent_blacklist_from_file(logger: &Logger) {
-    // Load only once to avoid repeated file I/O and log spam
-    if PERMANENT_FILE_BLACKLIST_LOADED.load(Ordering::SeqCst) {
-        return;
-    }
-    PERMANENT_FILE_BLACKLIST_LOADED.store(true, Ordering::SeqCst);
-
-    let path = "blacklist.json";
-
-    let contents = match std::fs::read_to_string(path) {
-        Ok(c) => c,
-        Err(e) => {
-            logger.log(
-                format!(
-                    "No {} found or failed to read ({}); proceeding with empty permanent blacklist",
-                    path, e
-                )
-                .yellow()
-                .to_string(),
-            );
-            return;
-        }
-    };
-
-    let parsed: Result<Vec<String>, _> = serde_json::from_str(&contents);
-    let mints = match parsed {
-        Ok(v) => v,
-        Err(e) => {
-            logger.log(
-                format!(
-                    "Failed to parse {} as JSON array of strings: {}",
-                    path, e
-                )
-                .red()
-                .to_string(),
-            );
-            return;
-        }
-    };
-
-    for mint in mints {
-        let trimmed = mint.trim();
-        if !trimmed.is_empty() {
-            PERMANENT_FILE_BLACKLIST.insert(trimmed.to_string(), ());
-        }
-    }
-
-    logger.log(
-        format!(
-            "Loaded {} permanent blacklist entries from {}",
-            PERMANENT_FILE_BLACKLIST.len(),
-            path
-        )
-        .green()
-        .to_string(),
-    );
-}
-
-#[allow(dead_code)]
-pub fn add_mint_to_file_blacklist(mint: &str, logger: &Logger) -> Result<(), String> {
-    // Ensure file-based blacklist is loaded so we merge, not overwrite
-    load_permanent_blacklist_from_file(logger);
-
-    let trimmed = mint.trim();
-    if trimmed.is_empty() {
-        return Err("Mint cannot be empty".to_string());
-    }
-
-    PERMANENT_FILE_BLACKLIST.insert(trimmed.to_string(), ());
-
-    // Collect all current mints into a Vec<String>
-    let mints: Vec<String> = PERMANENT_FILE_BLACKLIST
-        .iter()
-        .map(|entry| entry.key().clone())
-        .collect();
-
-    let json = serde_json::to_string_pretty(&mints)
-        .map_err(|e| format!("Failed to serialize blacklist.json: {}", e))?;
-
-    if let Err(e) = std::fs::write("blacklist.json", json) {
-        logger.log(
-            format!("Failed to write blacklist.json: {}", e)
-                .red()
-                .to_string(),
-        );
-        return Err(format!("Failed to write blacklist.json: {}", e));
-    }
-
-    logger.log(
-        format!(
-            "✅ Added {} to file-based permanent blacklist and persisted to blacklist.json",
-            trimmed
-        )
-        .green()
-        .to_string(),
-    );
-
-    Ok(())
-}
-
-#[allow(dead_code)]
-pub fn remove_mint_from_file_blacklist(mint: &str, logger: &Logger) -> Result<(), String> {
-    // Ensure file-based blacklist is loaded so state is consistent
-    load_permanent_blacklist_from_file(logger);
-
-    let trimmed = mint.trim();
-    if trimmed.is_empty() {
-        return Err("Mint cannot be empty".to_string());
-    }
-
-    let existed = PERMANENT_FILE_BLACKLIST.remove(trimmed).is_some();
-
-    if !existed {
-        logger.log(
-            format!(
-                "Mint {} was not present in file-based permanent blacklist",
-                trimmed
-            )
-            .yellow()
-            .to_string(),
-        );
-    }
-
-    // Persist the updated set back to blacklist.json
-    let mints: Vec<String> = PERMANENT_FILE_BLACKLIST
-        .iter()
-        .map(|entry| entry.key().clone())
-        .collect();
-
-    let json = serde_json::to_string_pretty(&mints)
-        .map_err(|e| format!("Failed to serialize blacklist.json: {}", e))?;
-
-    if let Err(e) = std::fs::write("blacklist.json", json) {
-        logger.log(
-            format!("Failed to write blacklist.json: {}", e)
-                .red()
-                .to_string(),
-        );
-        return Err(format!("Failed to write blacklist.json: {}", e));
-    }
-
-    logger.log(
-        format!(
-            "✅ Removed {} from file-based permanent blacklist and updated blacklist.json",
-            trimmed
-        )
-        .green()
-        .to_string(),
-    );
-
-    Ok(())
-}
-
-
-
 
 // Initialize the global counters with default values
 fn init_global_state() {
@@ -862,91 +702,6 @@ fn passes_universal_gates(
     // TODO: implement real universal gates (liquidity, market cap, volatility, etc.).
     // Stub returns true for now so behavior is unchanged while wiring is being built.
     true
-}
-
-
-// Maximum number of attempts for executing a buy transaction.
-// This is a simple global control; can be later made configurable per wallet.
-const EXECUTE_BUY_MAX_RETRIES: u32 = 3;
-
-/// Execute buy with simple retry logic.
-/// Retries the existing `execute_buy` up to EXECUTE_BUY_MAX_RETRIES times
-/// if it returns an error (e.g., exceeded slippage allowance or transient RPC issues).
-pub async fn execute_buy_with_retry(
-    trade_info: transaction_parser::TradeInfoFromToken,
-    app_state: Arc<AppState>,
-    swap_config: Arc<SwapConfig>,
-    protocol: SwapProtocol,
-) -> Result<(), String> {
-    let logger = Logger::new("[EXECUTE-BUY-RETRY] => ".green().to_string());
-    let mut attempt: u32 = 0;
-
-    loop {
-        attempt += 1;
-
-        logger.log(
-            format!(
-                "🔄 Buy attempt {} for token {}",
-                attempt,
-                trade_info.mint
-            )
-            .cyan()
-            .to_string(),
-        );
-
-        match execute_buy(
-            trade_info.clone(),
-            app_state.clone(),
-            swap_config.clone(),
-            protocol.clone(),
-        ).await {
-            Ok(_) => {
-                if attempt > 1 {
-                    logger.log(
-                        format!(
-                            "✅ Buy succeeded on attempt {} for token {}",
-                            attempt,
-                            trade_info.mint
-                        )
-                        .green()
-                        .to_string(),
-                    );
-                }
-                return Ok(());
-            }
-            Err(e) => {
-                if attempt >= EXECUTE_BUY_MAX_RETRIES {
-                    logger.log(
-                        format!(
-                            "❌ Buy failed after {} attempts for token {}: {}",
-                            attempt,
-                            trade_info.mint,
-                            e
-                        )
-                        .red()
-                        .to_string(),
-                    );
-                    return Err(format!(
-                        "Buy failed after {} attempts: {}",
-                        attempt, e
-                    ));
-                } else {
-                    logger.log(
-                        format!(
-                            "⚠️ Buy attempt {} failed for token {}: {}. Retrying...",
-                            attempt,
-                            trade_info.mint,
-                            e
-                        )
-                        .yellow()
-                        .to_string(),
-                    );
-                    // Small delay before retrying; tuned conservatively.
-                    time::sleep(Duration::from_millis(200)).await;
-                }
-            }
-        }
-    }
 }
 
 /// Execute buy operation based on detected transaction
@@ -3898,7 +3653,7 @@ async fn execute_sniper_buy(
     }
     
     // Execute buy using existing logic
-    match execute_buy_with_retry(
+    match execute_buy(
         parsed_data.clone(),
         config.app_state.clone().into(),
         Arc::new(config.swap_config.clone()),
@@ -4640,7 +4395,7 @@ async fn handle_parsed_data_for_buying(
     
     // Handle buy transaction
     if parsed_data.is_buy {
-        match execute_buy_with_retry(
+        match execute_buy(
             parsed_data.clone(),
             config.app_state.clone().into(),
             Arc::new(config.swap_config.clone()),

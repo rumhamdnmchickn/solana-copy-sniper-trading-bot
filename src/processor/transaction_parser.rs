@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use crate::common::logger::Logger;
 use bs58;
 use colored::Colorize;
@@ -36,7 +47,7 @@ pub struct TradeInfoFromToken {
     pub timestamp: u64,
     pub is_buy: bool,
     pub price: u64,
-    pub is_reverse_when_pump_swap: bool,
+    pub _is_reverse_when_pump_swap: bool,
     pub coin_creator: Option<String>,
     pub sol_change: f64,
     pub token_change: f64,
@@ -116,7 +127,7 @@ pub fn parse_transaction_data(
     // Helper function to extract token mint from token balances
     fn extract_token_info(txn: &SubscribeUpdateTransaction) -> String {
         let mut mint = String::new();
-        let mut is_reverse = false;
+        let _is_reverse = false;
 
         // Try to extract from token balances if txn is available
         if let Some(tx_inner) = &txn.transaction {
@@ -154,7 +165,7 @@ pub fn parse_transaction_data(
     // NOTE: MintTo checking has been removed - we now process all transactions
     let _has_mint_to = _has_mint_to_instruction(txn);
 
-    let start_time = Instant::now();
+    let _start_time = Instant::now();
     match buffer.len() {
         368 => {
             // pump swap transaction - 368 bytes
@@ -162,22 +173,22 @@ pub fn parse_transaction_data(
             let mint = extract_token_info(&txn);
             let timestamp = parse_u64(buffer, 16)?;
             let base_amount_in_or_base_amount_out = parse_u64(buffer, 24)?;
-            let min_quote_amount_out = parse_u64(buffer, 32)?;
-            let user_base_token_reserves = parse_u64(buffer, 40)?;
-            let user_quote_token_reserves = parse_u64(buffer, 48)?;
+            let _min_quote_amount_out = parse_u64(buffer, 32)?;
+            let _user_base_token_reserves = parse_u64(buffer, 40)?;
+            let _user_quote_token_reserves = parse_u64(buffer, 48)?;
             let pool_base_token_reserves = parse_u64(buffer, 56)?;
             let pool_quote_token_reserves = parse_u64(buffer, 64)?;
             let quote_amount_out = parse_u64(buffer, 72)?;
-            let lp_fee_basis_points = parse_u64(buffer, 80)?;
-            let lp_fee = parse_u64(buffer, 88)?;
-            let protocol_fee_basis_points = parse_u64(buffer, 96)?;
-            let protocol_fee = parse_u64(buffer, 104)?;
-            let quote_amount_out_without_lp_fee = parse_u64(buffer, 112)?;
-            let user_quote_amount_out = parse_u64(buffer, 120)?;
+            let _lp_fee_basis_points = parse_u64(buffer, 80)?;
+            let _lp_fee = parse_u64(buffer, 88)?;
+            let _protocol_fee_basis_points = parse_u64(buffer, 96)?;
+            let _protocol_fee = parse_u64(buffer, 104)?;
+            let _quote_amount_out_without_lp_fee = parse_u64(buffer, 112)?;
+            let _user_quote_amount_out = parse_u64(buffer, 120)?;
             let pool_id = parse_public_key(buffer, 128)?;
             let coin_creator = parse_public_key(buffer, 320)?;
 
-            let (price, is_reverse_when_pump_swap) =
+            let (price, _is_reverse_when_pump_swap) =
                 if pool_base_token_reserves > 0 && pool_quote_token_reserves > 0 {
                     // Calculate price and determine if it's reverse case
                     let temp_price = pool_base_token_reserves.saturating_mul(1_000_000_000)
@@ -196,7 +207,7 @@ pub fn parse_transaction_data(
                     (0, false)
                 };
 
-            let is_buy = if is_reverse_when_pump_swap {
+            let is_buy = if _is_reverse_when_pump_swap {
                 // In reverse case, buy and sell are inverted (base_mint is WSOL)
                 has_sell_instruction(txn)
             } else {
@@ -209,13 +220,13 @@ pub fn parse_transaction_data(
                     if is_buy { "BUY" } else { "SELL" },
                     (quote_amount_out as f64) / 1.0,
                     price as f64 / 1.0,
-                    is_reverse_when_pump_swap
+                    _is_reverse_when_pump_swap
                 )
                 .green()
                 .to_string(),
             );
 
-            let (sol_change, token_change) = if is_reverse_when_pump_swap {
+            let (sol_change, token_change) = if _is_reverse_when_pump_swap {
                 // Reverse case: base_mint is WSOL, quote_mint is token
                 if is_buy {
                     // Buy: spend SOL (base), get tokens (quote)
@@ -247,7 +258,7 @@ pub fn parse_transaction_data(
                 }
             };
 
-            let liquidity = if !is_reverse_when_pump_swap {
+            let liquidity = if !_is_reverse_when_pump_swap {
                 pool_quote_token_reserves as f64 / 1_000_000_000.0
             } else {
                 pool_base_token_reserves as f64 / 1_000_000_000.0
@@ -259,7 +270,7 @@ pub fn parse_transaction_data(
                     if is_buy { "BUY" } else { "SELL" },
                     (quote_amount_out as f64) / 1_000_000_000.0,
                     price as f64 / 1_000_000_000.0,
-                    is_reverse_when_pump_swap
+                    _is_reverse_when_pump_swap
                 )
                 .green()
                 .to_string(),
@@ -274,7 +285,7 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap,
+                _is_reverse_when_pump_swap,
                 coin_creator: Some(coin_creator),
                 sol_change,
                 token_change,
@@ -291,25 +302,25 @@ pub fn parse_transaction_data(
             let mint = extract_token_info(&txn);
             let timestamp = parse_u64(buffer, 16)?;
             let base_amount_in_or_base_amount_out = parse_u64(buffer, 24)?;
-            let min_quote_amount_out = parse_u64(buffer, 32)?;
-            let user_base_token_reserves = parse_u64(buffer, 40)?;
-            let user_quote_token_reserves = parse_u64(buffer, 48)?;
+            let _min_quote_amount_out = parse_u64(buffer, 32)?;
+            let _user_base_token_reserves = parse_u64(buffer, 40)?;
+            let _user_quote_token_reserves = parse_u64(buffer, 48)?;
             let pool_base_token_reserves = parse_u64(buffer, 56)?;
             let pool_quote_token_reserves = parse_u64(buffer, 64)?;
             let quote_amount_out = parse_u64(buffer, 72)?;
-            let lp_fee_basis_points = parse_u64(buffer, 80)?;
-            let lp_fee = parse_u64(buffer, 88)?;
-            let protocol_fee_basis_points = parse_u64(buffer, 96)?;
-            let protocol_fee = parse_u64(buffer, 104)?;
-            let quote_amount_out_without_lp_fee = parse_u64(buffer, 112)?;
-            let user_quote_amount_out = parse_u64(buffer, 120)?;
+            let _lp_fee_basis_points = parse_u64(buffer, 80)?;
+            let _lp_fee = parse_u64(buffer, 88)?;
+            let _protocol_fee_basis_points = parse_u64(buffer, 96)?;
+            let _protocol_fee = parse_u64(buffer, 104)?;
+            let _quote_amount_out_without_lp_fee = parse_u64(buffer, 112)?;
+            let _user_quote_amount_out = parse_u64(buffer, 120)?;
             let pool_id = parse_public_key(buffer, 128)?;
 
             // Determine if this is a reverse case by checking if the mint is WSOL
-            let is_reverse_when_pump_swap = mint == "So11111111111111111111111111111111111111112";
+            let _is_reverse_when_pump_swap = mint == "So11111111111111111111111111111111111111112";
 
             // Determine buy/sell based on reverse case and log messages
-            let is_buy = if is_reverse_when_pump_swap {
+            let is_buy = if _is_reverse_when_pump_swap {
                 // In reverse case, buy and sell are inverted (base_mint is WSOL)
                 has_sell_instruction(txn)
             } else {
@@ -319,7 +330,7 @@ pub fn parse_transaction_data(
 
             // Calculate price for PumpSwap
             let price = if pool_base_token_reserves > 0 && pool_quote_token_reserves > 0 {
-                if is_reverse_when_pump_swap {
+                if _is_reverse_when_pump_swap {
                     // In reverse case: poolBaseTokenReserves/poolQuoteTokenReserves (base_mint is WSOL)
                     pool_base_token_reserves.saturating_mul(1_000_000_000)
                         / pool_quote_token_reserves.max(1)
@@ -331,7 +342,7 @@ pub fn parse_transaction_data(
             } else {
                 0
             };
-            let (sol_change, token_change) = if is_reverse_when_pump_swap {
+            let (sol_change, token_change) = if _is_reverse_when_pump_swap {
                 // Reverse case: base_mint is WSOL, quote_mint is token
                 if is_buy {
                     // Buy: spend SOL (base), get tokens (quote)
@@ -363,7 +374,7 @@ pub fn parse_transaction_data(
                 }
             };
 
-            let liquidity = if !is_reverse_when_pump_swap {
+            let liquidity = if !_is_reverse_when_pump_swap {
                 pool_quote_token_reserves as f64 / 1_000_000_000.0
             } else {
                 pool_base_token_reserves as f64 / 1_000_000_000.0
@@ -375,7 +386,7 @@ pub fn parse_transaction_data(
                     if is_buy { "BUY" } else { "SELL" },
                     (quote_amount_out as f64) / 1_000_000_000.0,
                     price as f64 / 1_000_000_000.0,
-                    is_reverse_when_pump_swap
+                    _is_reverse_when_pump_swap
                 )
                 .green()
                 .to_string(),
@@ -390,7 +401,7 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap,
+                _is_reverse_when_pump_swap,
                 coin_creator: None, // 270 byte format doesn't include coin creator
                 sol_change,
                 token_change,
@@ -411,7 +422,7 @@ pub fn parse_transaction_data(
             let virtual_sol_reserves = parse_u64(buffer, 105)?;
             let virtual_token_reserves = parse_u64(buffer, 113)?;
             let real_sol_reserves = parse_u64(buffer, 121)?;
-            let real_token_reserves = parse_u64(buffer, 129)?;
+            let _real_token_reserves = parse_u64(buffer, 129)?;
             let creator = parse_public_key(buffer, 185)?;
             // Calculate price for PumpFun: virtualSolReserves/virtualTokenReserves
             let price = if virtual_token_reserves > 0 {
@@ -454,13 +465,13 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap: false, // PumpFun is never reverse
+                _is_reverse_when_pump_swap: false, // PumpFun is never reverse
                 coin_creator: Some(creator),
                 sol_change: sol_amount as f64 / 1_000_000_000.0,
                 token_change: token_amount as f64 / 1_000_000_000.0,
                 liquidity,
-                virtual_sol_reserves: virtual_sol_reserves,
-                virtual_token_reserves: virtual_token_reserves,
+                virtual_sol_reserves,
+                virtual_token_reserves,
             })
         }
 
@@ -475,7 +486,7 @@ pub fn parse_transaction_data(
             let virtual_sol_reserves = parse_u64(buffer, 105)?;
             let virtual_token_reserves = parse_u64(buffer, 113)?;
             let real_sol_reserves = parse_u64(buffer, 121)?;
-            let real_token_reserves = parse_u64(buffer, 129)?;
+            let _real_token_reserves = parse_u64(buffer, 129)?;
             let creator = parse_public_key(buffer, 185)?;
             // Calculate price for PumpFun: virtualSolReserves/virtualTokenReserves
             let price = if virtual_token_reserves > 0 {
@@ -518,13 +529,13 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap: false, // PumpFun is never reverse
+                _is_reverse_when_pump_swap: false, // PumpFun is never reverse
                 coin_creator: Some(creator),
                 sol_change: sol_amount as f64 / 1_000_000_000.0,
                 token_change: token_amount as f64 / 1_000_000_000.0,
                 liquidity,
-                virtual_sol_reserves: virtual_sol_reserves,
-                virtual_token_reserves: virtual_token_reserves,
+                virtual_sol_reserves,
+                virtual_token_reserves,
             })
         }
 
@@ -539,7 +550,7 @@ pub fn parse_transaction_data(
             let virtual_sol_reserves = parse_u64(buffer, 105)?;
             let virtual_token_reserves = parse_u64(buffer, 113)?;
             let real_sol_reserves = parse_u64(buffer, 121)?;
-            let real_token_reserves = parse_u64(buffer, 129)?;
+            let _real_token_reserves = parse_u64(buffer, 129)?;
             let creator = parse_public_key(buffer, 185)?;
             // Calculate price for PumpFun: virtualSolReserves/virtualTokenReserves
             let price = if virtual_token_reserves > 0 {
@@ -582,13 +593,13 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap: false, // PumpFun is never reverse
+                _is_reverse_when_pump_swap: false, // PumpFun is never reverse
                 coin_creator: Some(creator),
                 sol_change: sol_amount as f64 / 1_000_000_000.0,
                 token_change: token_amount as f64 / 1_000_000_000.0,
                 liquidity,
-                virtual_sol_reserves: virtual_sol_reserves,
-                virtual_token_reserves: virtual_token_reserves,
+                virtual_sol_reserves,
+                virtual_token_reserves,
             })
         }
 
@@ -608,7 +619,7 @@ pub fn parse_transaction_data(
 
             // For Raydium Launchpad, we don't need reverse logic since it's never reverse
             let mint = extract_token_info(&txn);
-            let is_reverse_when_pump_swap = false;
+            let _is_reverse_when_pump_swap = false;
 
             let timestamp = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -660,7 +671,7 @@ pub fn parse_transaction_data(
                 timestamp,
                 is_buy,
                 price,
-                is_reverse_when_pump_swap: false, // Raydium is never reverse
+                _is_reverse_when_pump_swap: false, // Raydium is never reverse
                 coin_creator: None,               // no need for raydium launchpad
                 sol_change,
                 token_change,

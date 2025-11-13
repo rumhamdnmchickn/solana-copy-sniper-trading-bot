@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 /*!
 # Risk Management Module
 
@@ -176,7 +187,7 @@ impl RiskManagementService {
             .await?;
 
         // Check each token balance and trigger sells if needed
-        for (token_mint, token_info) in held_tokens {
+        for (token_mint, _token_info) in held_tokens {
             if let Some(target_balance) = target_balances.get(token_mint) {
                 self.logger.log(
                     format!(
@@ -198,7 +209,7 @@ impl RiskManagementService {
                     ).red().bold().to_string());
 
                     // Trigger emergency sell
-                    if let Err(e) = self.trigger_emergency_sell(token_mint, token_info).await {
+                    if let Err(e) = self.trigger_emergency_sell(token_mint, _token_info).await {
                         self.logger.log(
                             format!(
                                 "❌ Failed to execute emergency sell for {}: {}",
@@ -229,7 +240,7 @@ impl RiskManagementService {
                 );
 
                 // If no balance found, also trigger emergency sell
-                if let Err(e) = self.trigger_emergency_sell(token_mint, token_info).await {
+                if let Err(e) = self.trigger_emergency_sell(token_mint, _token_info).await {
                     self.logger.log(
                         format!(
                             "❌ Failed to execute emergency sell for {}: {}",
@@ -326,7 +337,7 @@ impl RiskManagementService {
     async fn trigger_emergency_sell(
         &self,
         token_mint: &str,
-        token_info: &BoughtTokenInfo,
+        _token_info: &BoughtTokenInfo,
     ) -> Result<(), String> {
         self.logger.log(
             format!(

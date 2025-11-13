@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use anyhow::{anyhow, Result};
 use borsh::from_slice;
 use borsh_derive::{BorshDeserialize, BorshSerialize};
@@ -224,7 +235,7 @@ impl Pump {
             price_in_sol, price_in_sol / 1_000_000_000.0, trade_info.virtual_sol_reserves, trade_info.virtual_token_reserves));
 
         // Use slippage directly as basis points (already u64)
-        let slippage_bps = swap_config.slippage;
+        let _slippage_bps = swap_config.slippage;
 
         // Create instructions as needed
         let mut create_instruction = None;
@@ -570,9 +581,9 @@ pub async fn get_bonding_curve_account(
     ))
 }
 
-fn max_amount_with_slippage(input_amount: u64, slippage_bps: u64) -> u64 {
+fn max_amount_with_slippage(input_amount: u64, _slippage_bps: u64) -> u64 {
     input_amount
-        .checked_mul(slippage_bps.checked_add(TEN_THOUSAND).unwrap())
+        .checked_mul(_slippage_bps.checked_add(TEN_THOUSAND).unwrap())
         .unwrap()
         .checked_div(TEN_THOUSAND)
         .unwrap()

@@ -894,7 +894,7 @@ pub async fn execute_buy_with_retry(
             .to_string(),
         );
 
-        match execute_buy(
+        match execute_buy_with_retry(
             trade_info.clone(),
             app_state.clone(),
             swap_config.clone(),

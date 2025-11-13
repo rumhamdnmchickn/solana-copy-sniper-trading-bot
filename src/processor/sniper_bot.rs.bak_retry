@@ -864,91 +864,6 @@ fn passes_universal_gates(
     true
 }
 
-
-// Maximum number of attempts for executing a buy transaction.
-// This is a simple global control; can be later made configurable per wallet.
-const EXECUTE_BUY_MAX_RETRIES: u32 = 3;
-
-/// Execute buy with simple retry logic.
-/// Retries the existing `execute_buy` up to EXECUTE_BUY_MAX_RETRIES times
-/// if it returns an error (e.g., exceeded slippage allowance or transient RPC issues).
-pub async fn execute_buy_with_retry(
-    trade_info: transaction_parser::TradeInfoFromToken,
-    app_state: Arc<AppState>,
-    swap_config: Arc<SwapConfig>,
-    protocol: SwapProtocol,
-) -> Result<(), String> {
-    let logger = Logger::new("[EXECUTE-BUY-RETRY] => ".green().to_string());
-    let mut attempt: u32 = 0;
-
-    loop {
-        attempt += 1;
-
-        logger.log(
-            format!(
-                "🔄 Buy attempt {} for token {}",
-                attempt,
-                trade_info.mint
-            )
-            .cyan()
-            .to_string(),
-        );
-
-        match execute_buy(
-            trade_info.clone(),
-            app_state.clone(),
-            swap_config.clone(),
-            protocol.clone(),
-        ).await {
-            Ok(_) => {
-                if attempt > 1 {
-                    logger.log(
-                        format!(
-                            "✅ Buy succeeded on attempt {} for token {}",
-                            attempt,
-                            trade_info.mint
-                        )
-                        .green()
-                        .to_string(),
-                    );
-                }
-                return Ok(());
-            }
-            Err(e) => {
-                if attempt >= EXECUTE_BUY_MAX_RETRIES {
-                    logger.log(
-                        format!(
-                            "❌ Buy failed after {} attempts for token {}: {}",
-                            attempt,
-                            trade_info.mint,
-                            e
-                        )
-                        .red()
-                        .to_string(),
-                    );
-                    return Err(format!(
-                        "Buy failed after {} attempts: {}",
-                        attempt, e
-                    ));
-                } else {
-                    logger.log(
-                        format!(
-                            "⚠️ Buy attempt {} failed for token {}: {}. Retrying...",
-                            attempt,
-                            trade_info.mint,
-                            e
-                        )
-                        .yellow()
-                        .to_string(),
-                    );
-                    // Small delay before retrying; tuned conservatively.
-                    time::sleep(Duration::from_millis(200)).await;
-                }
-            }
-        }
-    }
-}
-
 /// Execute buy operation based on detected transaction
 pub async fn execute_buy(
     trade_info: transaction_parser::TradeInfoFromToken,
@@ -3898,7 +3813,7 @@ async fn execute_sniper_buy(
     }
     
     // Execute buy using existing logic
-    match execute_buy_with_retry(
+    match execute_buy(
         parsed_data.clone(),
         config.app_state.clone().into(),
         Arc::new(config.swap_config.clone()),
@@ -4640,7 +4555,7 @@ async fn handle_parsed_data_for_buying(
     
     // Handle buy transaction
     if parsed_data.is_buy {
-        match execute_buy_with_retry(
+        match execute_buy(
             parsed_data.clone(),
             config.app_state.clone().into(),
             Arc::new(config.swap_config.clone()),

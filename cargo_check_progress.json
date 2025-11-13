@@ -1,0 +1,3120 @@
+{
+  "timestamp": "2025-11-13T18:18:14.206923Z",
+  "return_code": 0,
+  "messages": [
+    {
+      "rendered": "warning: unused imports: `ZeroSlotClient` and `self`\n --> src/block_engine/tx.rs:7:25\n  |\n7 |     library::zeroslot::{self, ZeroSlotClient},\n  |                         ^^^^  ^^^^^^^^^^^^^^\n  |\n  = note: `#[warn(unused_imports)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(unused_imports)]` on by default",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the unused imports",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 239,
+              "byte_start": 192,
+              "column_end": 46,
+              "column_start": 29,
+              "expansion": null,
+              "file_name": "src/block_engine/tx.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 7,
+              "line_start": 6,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 30,
+                  "highlight_start": 29,
+                  "text": "    common::{logger::Logger},"
+                },
+                {
+                  "highlight_end": 46,
+                  "highlight_start": 1,
+                  "text": "    library::zeroslot::{self, ZeroSlotClient},"
+                }
+              ]
+            },
+            {
+              "byte_end": 168,
+              "byte_start": 162,
+              "column_end": 5,
+              "column_start": 12,
+              "expansion": null,
+              "file_name": "src/block_engine/tx.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 6,
+              "line_start": 5,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 13,
+                  "highlight_start": 12,
+                  "text": "use crate::{"
+                },
+                {
+                  "highlight_end": 5,
+                  "highlight_start": 1,
+                  "text": "    common::{logger::Logger},"
+                }
+              ]
+            },
+            {
+              "byte_end": 242,
+              "byte_start": 239,
+              "column_end": 2,
+              "column_start": 46,
+              "expansion": null,
+              "file_name": "src/block_engine/tx.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 8,
+              "line_start": 7,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 47,
+                  "highlight_start": 46,
+                  "text": "    library::zeroslot::{self, ZeroSlotClient},"
+                },
+                {
+                  "highlight_end": 2,
+                  "highlight_start": 1,
+                  "text": "};"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused imports: `ZeroSlotClient` and `self`",
+      "spans": [
+        {
+          "byte_end": 222,
+          "byte_start": 218,
+          "column_end": 29,
+          "column_start": 25,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 7,
+          "line_start": 7,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 29,
+              "highlight_start": 25,
+              "text": "    library::zeroslot::{self, ZeroSlotClient},"
+            }
+          ]
+        },
+        {
+          "byte_end": 238,
+          "byte_start": 224,
+          "column_end": 45,
+          "column_start": 31,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 7,
+          "line_start": 7,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 45,
+              "highlight_start": 31,
+              "text": "    library::zeroslot::{self, ZeroSlotClient},"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `system_instruction`\n  --> src/block_engine/tx.rs:12:51\n   |\n12 |     instruction::Instruction, signature::Keypair, system_instruction, transaction::Transaction,\n   |                                                   ^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the unused import",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 496,
+              "byte_start": 476,
+              "column_end": 69,
+              "column_start": 49,
+              "expansion": null,
+              "file_name": "src/block_engine/tx.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 12,
+              "line_start": 12,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 69,
+                  "highlight_start": 49,
+                  "text": "    instruction::Instruction, signature::Keypair, system_instruction, transaction::Transaction,"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `system_instruction`",
+      "spans": [
+        {
+          "byte_end": 496,
+          "byte_start": 478,
+          "column_end": 69,
+          "column_start": 51,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 12,
+          "line_start": 12,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 69,
+              "highlight_start": 51,
+              "text": "    instruction::Instruction, signature::Keypair, system_instruction, transaction::Transaction,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `solana_sdk::signer::keypair::Keypair`\n  --> src/processor/sniper_bot.rs:35:5\n   |\n35 | use solana_sdk::signer::keypair::Keypair;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the whole `use` item",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 1417,
+              "byte_start": 1375,
+              "column_end": 1,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 36,
+              "line_start": 35,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 42,
+                  "highlight_start": 1,
+                  "text": "use solana_sdk::signer::keypair::Keypair;"
+                },
+                {
+                  "highlight_end": 1,
+                  "highlight_start": 1,
+                  "text": "use futures_util::stream::StreamExt;"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `solana_sdk::signer::keypair::Keypair`",
+      "spans": [
+        {
+          "byte_end": 1415,
+          "byte_start": 1379,
+          "column_end": 41,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 35,
+          "line_start": 35,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 41,
+              "highlight_start": 5,
+              "text": "use solana_sdk::signer::keypair::Keypair;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `constants::WHALE_SELLING_AMOUNT_FOR_SELLING_TRIGGER`\n  --> src/processor/sniper_bot.rs:49:5\n   |\n49 |     constants::WHALE_SELLING_AMOUNT_FOR_SELLING_TRIGGER,\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the unused import",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 2052,
+              "byte_start": 1995,
+              "column_end": 56,
+              "column_start": 33,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 49,
+              "line_start": 48,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 34,
+                  "highlight_start": 33,
+                  "text": "    cache::WALLET_TOKEN_ACCOUNTS,"
+                },
+                {
+                  "highlight_end": 56,
+                  "highlight_start": 1,
+                  "text": "    constants::WHALE_SELLING_AMOUNT_FOR_SELLING_TRIGGER,"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `constants::WHALE_SELLING_AMOUNT_FOR_SELLING_TRIGGER`",
+      "spans": [
+        {
+          "byte_end": 2052,
+          "byte_start": 2001,
+          "column_end": 56,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 49,
+          "line_start": 49,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 56,
+              "highlight_start": 5,
+              "text": "    constants::WHALE_SELLING_AMOUNT_FOR_SELLING_TRIGGER,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused imports: `DexType` and `TradeInfoFromToken`\n  --> src/processor/sniper_bot.rs:52:44\n   |\n52 | use crate::processor::transaction_parser::{DexType, TradeInfoFromToken};\n   |                                            ^^^^^^^  ^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the whole `use` item",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 2201,
+              "byte_start": 2128,
+              "column_end": 1,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 53,
+              "line_start": 52,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 73,
+                  "highlight_start": 1,
+                  "text": "use crate::processor::transaction_parser::{DexType, TradeInfoFromToken};"
+                },
+                {
+                  "highlight_end": 1,
+                  "highlight_start": 1,
+                  "text": "use crate::processor::selling_strategy::{TokenTrackingInfo as SellingTokenTrackingInfo, TokenMetrics};"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused imports: `DexType` and `TradeInfoFromToken`",
+      "spans": [
+        {
+          "byte_end": 2178,
+          "byte_start": 2171,
+          "column_end": 51,
+          "column_start": 44,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 52,
+          "line_start": 52,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 51,
+              "highlight_start": 44,
+              "text": "use crate::processor::transaction_parser::{DexType, TradeInfoFromToken};"
+            }
+          ]
+        },
+        {
+          "byte_end": 2198,
+          "byte_start": 2180,
+          "column_end": 71,
+          "column_start": 53,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 52,
+          "line_start": 52,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 71,
+              "highlight_start": 53,
+              "text": "use crate::processor::transaction_parser::{DexType, TradeInfoFromToken};"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused imports: `TokenMetrics` and `TokenTrackingInfo as SellingTokenTrackingInfo`\n  --> src/processor/sniper_bot.rs:53:42\n   |\n53 | use crate::processor::selling_strategy::{TokenTrackingInfo as SellingTokenTrackingInfo, TokenMetrics};\n   |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the whole `use` item",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 2304,
+              "byte_start": 2201,
+              "column_end": 1,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 54,
+              "line_start": 53,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 103,
+                  "highlight_start": 1,
+                  "text": "use crate::processor::selling_strategy::{TokenTrackingInfo as SellingTokenTrackingInfo, TokenMetrics};"
+                },
+                {
+                  "highlight_end": 1,
+                  "highlight_start": 1,
+                  "text": "use crate::processor::transaction_retry;"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused imports: `TokenMetrics` and `TokenTrackingInfo as SellingTokenTrackingInfo`",
+      "spans": [
+        {
+          "byte_end": 2287,
+          "byte_start": 2242,
+          "column_end": 87,
+          "column_start": 42,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 53,
+          "line_start": 53,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 87,
+              "highlight_start": 42,
+              "text": "use crate::processor::selling_strategy::{TokenTrackingInfo as SellingTokenTrackingInfo, TokenMetrics};"
+            }
+          ]
+        },
+        {
+          "byte_end": 2301,
+          "byte_start": 2289,
+          "column_end": 101,
+          "column_start": 89,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 53,
+          "line_start": 53,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 101,
+              "highlight_start": 89,
+              "text": "use crate::processor::selling_strategy::{TokenTrackingInfo as SellingTokenTrackingInfo, TokenMetrics};"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `crate::processor::transaction_retry`\n  --> src/processor/sniper_bot.rs:54:5\n   |\n54 | use crate::processor::transaction_retry;\n   |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the whole `use` item",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 2345,
+              "byte_start": 2304,
+              "column_end": 1,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 55,
+              "line_start": 54,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 41,
+                  "highlight_start": 1,
+                  "text": "use crate::processor::transaction_retry;"
+                },
+                {
+                  "highlight_end": 1,
+                  "highlight_start": 1,
+                  "text": "use dashmap::DashMap;"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `crate::processor::transaction_retry`",
+      "spans": [
+        {
+          "byte_end": 2343,
+          "byte_start": 2308,
+          "column_end": 40,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 54,
+          "line_start": 54,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 40,
+              "highlight_start": 5,
+              "text": "use crate::processor::transaction_retry;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `chrono::Timelike`\n  --> src/processor/sniper_bot.rs:59:5\n   |\n59 | use chrono::Timelike;\n   |     ^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the whole `use` item",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 2541,
+              "byte_start": 2519,
+              "column_end": 1,
+              "column_start": 1,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 60,
+              "line_start": 59,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 22,
+                  "highlight_start": 1,
+                  "text": "use chrono::Timelike;"
+                },
+                {
+                  "highlight_end": 1,
+                  "highlight_start": 1,
+                  "text": ""
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `chrono::Timelike`",
+      "spans": [
+        {
+          "byte_end": 2539,
+          "byte_start": 2523,
+          "column_end": 21,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 59,
+          "line_start": 59,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 21,
+              "highlight_start": 5,
+              "text": "use chrono::Timelike;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused import: `Sink`\n    --> src/processor/sniper_bot.rs:1275:33\n     |\n1275 |     use futures_util::{SinkExt, Sink};\n     |                                 ^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the unused import",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 61358,
+              "byte_start": 61352,
+              "column_end": 37,
+              "column_start": 31,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1275,
+              "line_start": 1275,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 37,
+                  "highlight_start": 31,
+                  "text": "    use futures_util::{SinkExt, Sink};"
+                }
+              ]
+            },
+            {
+              "byte_end": 61345,
+              "byte_start": 61344,
+              "column_end": 24,
+              "column_start": 23,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1275,
+              "line_start": 1275,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 24,
+                  "highlight_start": 23,
+                  "text": "    use futures_util::{SinkExt, Sink};"
+                }
+              ]
+            },
+            {
+              "byte_end": 61359,
+              "byte_start": 61358,
+              "column_end": 38,
+              "column_start": 37,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1275,
+              "line_start": 1275,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 38,
+                  "highlight_start": 37,
+                  "text": "    use futures_util::{SinkExt, Sink};"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused import: `Sink`",
+      "spans": [
+        {
+          "byte_end": 61358,
+          "byte_start": 61354,
+          "column_end": 37,
+          "column_start": 33,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1275,
+          "line_start": 1275,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 37,
+              "highlight_start": 33,
+              "text": "    use futures_util::{SinkExt, Sink};"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused imports: `SubscribeRequestPing` and `SubscribeUpdate`\n    --> src/processor/sniper_bot.rs:1278:75\n     |\n1278 |         subscribe_update::UpdateOneof, CommitmentLevel, SubscribeRequest, SubscribeRequestPing,\n     |                                                                           ^^^^^^^^^^^^^^^^^^^^\n1279 |         SubscribeRequestFilterTransactions, SubscribeUpdate,\n     |                                             ^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove the unused imports",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 61567,
+              "byte_start": 61545,
+              "column_end": 95,
+              "column_start": 73,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1278,
+              "line_start": 1278,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 95,
+                  "highlight_start": 73,
+                  "text": "        subscribe_update::UpdateOneof, CommitmentLevel, SubscribeRequest, SubscribeRequestPing,"
+                }
+              ]
+            },
+            {
+              "byte_end": 61628,
+              "byte_start": 61611,
+              "column_end": 60,
+              "column_start": 43,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1279,
+              "line_start": 1279,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 60,
+                  "highlight_start": 43,
+                  "text": "        SubscribeRequestFilterTransactions, SubscribeUpdate,"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_imports",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused imports: `SubscribeRequestPing` and `SubscribeUpdate`",
+      "spans": [
+        {
+          "byte_end": 61567,
+          "byte_start": 61547,
+          "column_end": 95,
+          "column_start": 75,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1278,
+          "line_start": 1278,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 95,
+              "highlight_start": 75,
+              "text": "        subscribe_update::UpdateOneof, CommitmentLevel, SubscribeRequest, SubscribeRequestPing,"
+            }
+          ]
+        },
+        {
+          "byte_end": 61628,
+          "byte_start": 61613,
+          "column_end": 60,
+          "column_start": 45,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1279,
+          "line_start": 1279,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 60,
+              "highlight_start": 45,
+              "text": "        SubscribeRequestFilterTransactions, SubscribeUpdate,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: variable does not need to be mutable\n   --> src/block_engine/tx.rs:182:5\n    |\n182 |     mut instructions: Vec<Instruction>,\n    |     ----^^^^^^^^^^^^\n    |     |\n    |     help: remove this `mut`\n    |\n    = note: `#[warn(unused_mut)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(unused_mut)]` on by default",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove this `mut`",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 6584,
+              "byte_start": 6580,
+              "column_end": 9,
+              "column_start": 5,
+              "expansion": null,
+              "file_name": "src/block_engine/tx.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 182,
+              "line_start": 182,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 9,
+                  "highlight_start": 5,
+                  "text": "    mut instructions: Vec<Instruction>,"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_mut",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "variable does not need to be mutable",
+      "spans": [
+        {
+          "byte_end": 6596,
+          "byte_start": 6580,
+          "column_end": 21,
+          "column_start": 5,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 182,
+          "line_start": 182,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 21,
+              "highlight_start": 5,
+              "text": "    mut instructions: Vec<Instruction>,"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `rpc_client`\n   --> src/common/config.rs:128:21\n    |\n128 |                 let rpc_client = create_rpc_client().unwrap();\n    |                     ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_rpc_client`\n    |\n    = note: `#[warn(unused_variables)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(unused_variables)]` on by default",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 4731,
+              "byte_start": 4721,
+              "column_end": 31,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/common/config.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 128,
+              "line_start": 128,
+              "suggested_replacement": "_rpc_client",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 31,
+                  "highlight_start": 21,
+                  "text": "                let rpc_client = create_rpc_client().unwrap();"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `rpc_client`",
+      "spans": [
+        {
+          "byte_end": 4731,
+          "byte_start": 4721,
+          "column_end": 31,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/common/config.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 128,
+          "line_start": 128,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 31,
+              "highlight_start": 21,
+              "text": "                let rpc_client = create_rpc_client().unwrap();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `logger`\n   --> src/dex/pump_swap.rs:543:9\n    |\n543 |     let logger = Logger::new(\"[PUMPSWAP-PRICE-QUERY] => \".blue().to_string());\n    |         ^^^^^^ help: if this is intentional, prefix it with an underscore: `_logger`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 20616,
+              "byte_start": 20610,
+              "column_end": 15,
+              "column_start": 9,
+              "expansion": null,
+              "file_name": "src/dex/pump_swap.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 543,
+              "line_start": 543,
+              "suggested_replacement": "_logger",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 15,
+                  "highlight_start": 9,
+                  "text": "    let logger = Logger::new(\"[PUMPSWAP-PRICE-QUERY] => \".blue().to_string());"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `logger`",
+      "spans": [
+        {
+          "byte_end": 20616,
+          "byte_start": 20610,
+          "column_end": 15,
+          "column_start": 9,
+          "expansion": null,
+          "file_name": "src/dex/pump_swap.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 543,
+          "line_start": 543,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 15,
+              "highlight_start": 9,
+              "text": "    let logger = Logger::new(\"[PUMPSWAP-PRICE-QUERY] => \".blue().to_string());"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `logger`\n   --> src/processor/sniper_bot.rs:360:51\n    |\n360 | pub async fn check_and_stop_streaming_if_all_sold(logger: &Logger) {\n    |                                                   ^^^^^^ help: if this is intentional, prefix it with an underscore: `_logger`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 14958,
+              "byte_start": 14952,
+              "column_end": 57,
+              "column_start": 51,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 360,
+              "line_start": 360,
+              "suggested_replacement": "_logger",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 57,
+                  "highlight_start": 51,
+                  "text": "pub async fn check_and_stop_streaming_if_all_sold(logger: &Logger) {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `logger`",
+      "spans": [
+        {
+          "byte_end": 14958,
+          "byte_start": 14952,
+          "column_end": 57,
+          "column_start": 51,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 360,
+          "line_start": 360,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 57,
+              "highlight_start": 51,
+              "text": "pub async fn check_and_stop_streaming_if_all_sold(logger: &Logger) {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `signature`\n    --> src/processor/sniper_bot.rs:1336:37\n     |\n1336 | ...                   let signature = bs58::encode(signature_bytes).into_string();\n     |                           ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_signature`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 64159,
+              "byte_start": 64150,
+              "column_end": 46,
+              "column_start": 37,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1336,
+              "line_start": 1336,
+              "suggested_replacement": "_signature",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 46,
+                  "highlight_start": 37,
+                  "text": "                                let signature = bs58::encode(signature_bytes).into_string();"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `signature`",
+      "spans": [
+        {
+          "byte_end": 64159,
+          "byte_start": 64150,
+          "column_end": 46,
+          "column_start": 37,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1336,
+          "line_start": 1336,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 46,
+              "highlight_start": 37,
+              "text": "                                let signature = bs58::encode(signature_bytes).into_string();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `is_buy`\n    --> src/processor/sniper_bot.rs:1339:41\n     |\n1339 | ...                   let is_buy = meta.log_messages.iter().any(|log| {\n     |                           ^^^^^^ help: if this is intentional, prefix it with an underscore: `_is_buy`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 64362,
+              "byte_start": 64356,
+              "column_end": 47,
+              "column_start": 41,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 1339,
+              "line_start": 1339,
+              "suggested_replacement": "_is_buy",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 47,
+                  "highlight_start": 41,
+                  "text": "                                    let is_buy = meta.log_messages.iter().any(|log| {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `is_buy`",
+      "spans": [
+        {
+          "byte_end": 64362,
+          "byte_start": 64356,
+          "column_end": 47,
+          "column_start": 41,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1339,
+          "line_start": 1339,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 47,
+              "highlight_start": 41,
+              "text": "                                    let is_buy = meta.log_messages.iter().any(|log| {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `pump`\n    --> src/processor/sniper_bot.rs:2908:21\n     |\n2908 |                 let pump = crate::dex::pump_fun::Pump::new(\n     |                     ^^^^ help: if this is intentional, prefix it with an underscore: `_pump`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 135138,
+              "byte_start": 135134,
+              "column_end": 25,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 2908,
+              "line_start": 2908,
+              "suggested_replacement": "_pump",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 25,
+                  "highlight_start": 21,
+                  "text": "                let pump = crate::dex::pump_fun::Pump::new("
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `pump`",
+      "spans": [
+        {
+          "byte_end": 135138,
+          "byte_start": 135134,
+          "column_end": 25,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2908,
+          "line_start": 2908,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 25,
+              "highlight_start": 21,
+              "text": "                let pump = crate::dex::pump_fun::Pump::new("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `pump_swap`\n    --> src/processor/sniper_bot.rs:2969:21\n     |\n2969 |                 let pump_swap = crate::dex::pump_swap::PumpSwap::new(\n     |                     ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_pump_swap`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 138162,
+              "byte_start": 138153,
+              "column_end": 30,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 2969,
+              "line_start": 2969,
+              "suggested_replacement": "_pump_swap",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 30,
+                  "highlight_start": 21,
+                  "text": "                let pump_swap = crate::dex::pump_swap::PumpSwap::new("
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `pump_swap`",
+      "spans": [
+        {
+          "byte_end": 138162,
+          "byte_start": 138153,
+          "column_end": 30,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2969,
+          "line_start": 2969,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 30,
+              "highlight_start": 21,
+              "text": "                let pump_swap = crate::dex::pump_swap::PumpSwap::new("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `raydium`\n    --> src/processor/sniper_bot.rs:3028:21\n     |\n3028 |                 let raydium = crate::dex::raydium_launchpad::Raydium::new(\n     |                     ^^^^^^^ help: if this is intentional, prefix it with an underscore: `_raydium`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 141095,
+              "byte_start": 141088,
+              "column_end": 28,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3028,
+              "line_start": 3028,
+              "suggested_replacement": "_raydium",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 28,
+                  "highlight_start": 21,
+                  "text": "                let raydium = crate::dex::raydium_launchpad::Raydium::new("
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `raydium`",
+      "spans": [
+        {
+          "byte_end": 141095,
+          "byte_start": 141088,
+          "column_end": 28,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3028,
+          "line_start": 3028,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 28,
+              "highlight_start": 21,
+              "text": "                let raydium = crate::dex::raydium_launchpad::Raydium::new("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `pump`\n    --> src/processor/sniper_bot.rs:3083:21\n     |\n3083 |                 let pump = crate::dex::pump_fun::Pump::new(\n     |                     ^^^^ help: if this is intentional, prefix it with an underscore: `_pump`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 144056,
+              "byte_start": 144052,
+              "column_end": 25,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3083,
+              "line_start": 3083,
+              "suggested_replacement": "_pump",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 25,
+                  "highlight_start": 21,
+                  "text": "                let pump = crate::dex::pump_fun::Pump::new("
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `pump`",
+      "spans": [
+        {
+          "byte_end": 144056,
+          "byte_start": 144052,
+          "column_end": 25,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3083,
+          "line_start": 3083,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 25,
+              "highlight_start": 21,
+              "text": "                let pump = crate::dex::pump_fun::Pump::new("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `bought_count`\n    --> src/processor/sniper_bot.rs:3153:17\n     |\n3153 |             let bought_count = BOUGHT_TOKENS.get(&()).map(|r| *r).unwrap_or(0);\n     |                 ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_bought_count`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 147285,
+              "byte_start": 147273,
+              "column_end": 29,
+              "column_start": 17,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3153,
+              "line_start": 3153,
+              "suggested_replacement": "_bought_count",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 29,
+                  "highlight_start": 17,
+                  "text": "            let bought_count = BOUGHT_TOKENS.get(&()).map(|r| *r).unwrap_or(0);"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `bought_count`",
+      "spans": [
+        {
+          "byte_end": 147285,
+          "byte_start": 147273,
+          "column_end": 29,
+          "column_start": 17,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3153,
+          "line_start": 3153,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 29,
+              "highlight_start": 17,
+              "text": "            let bought_count = BOUGHT_TOKENS.get(&()).map(|r| *r).unwrap_or(0);"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `instruction_type`\n    --> src/processor/sniper_bot.rs:3309:9\n     |\n3309 |     let instruction_type = parsed_data.dex_type.clone();\n     |         ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_instruction_type`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 153693,
+              "byte_start": 153677,
+              "column_end": 25,
+              "column_start": 9,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3309,
+              "line_start": 3309,
+              "suggested_replacement": "_instruction_type",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 25,
+                  "highlight_start": 9,
+                  "text": "    let instruction_type = parsed_data.dex_type.clone();"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `instruction_type`",
+      "spans": [
+        {
+          "byte_end": 153693,
+          "byte_start": 153677,
+          "column_end": 25,
+          "column_start": 9,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3309,
+          "line_start": 3309,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 25,
+              "highlight_start": 9,
+              "text": "    let instruction_type = parsed_data.dex_type.clone();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `target_signature`\n    --> src/processor/sniper_bot.rs:3312:21\n     |\n3312 |     if let Some(ref target_signature) = target_signature {\n     |                     ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_target_signature`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 153832,
+              "byte_start": 153816,
+              "column_end": 37,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3312,
+              "line_start": 3312,
+              "suggested_replacement": "_target_signature",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 37,
+                  "highlight_start": 21,
+                  "text": "    if let Some(ref target_signature) = target_signature {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `target_signature`",
+      "spans": [
+        {
+          "byte_end": 153832,
+          "byte_start": 153816,
+          "column_end": 37,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3312,
+          "line_start": 3312,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 37,
+              "highlight_start": 21,
+              "text": "    if let Some(ref target_signature) = target_signature {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `config_clone`\n    --> src/processor/sniper_bot.rs:3564:9\n     |\n3564 |     let config_clone = config.clone();\n     |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_config_clone`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 164442,
+              "byte_start": 164430,
+              "column_end": 21,
+              "column_start": 9,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3564,
+              "line_start": 3564,
+              "suggested_replacement": "_config_clone",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 21,
+                  "highlight_start": 9,
+                  "text": "    let config_clone = config.clone();"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `config_clone`",
+      "spans": [
+        {
+          "byte_end": 164442,
+          "byte_start": 164430,
+          "column_end": 21,
+          "column_start": 9,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3564,
+          "line_start": 3564,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 21,
+              "highlight_start": 9,
+              "text": "    let config_clone = config.clone();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `logger_clone`\n    --> src/processor/sniper_bot.rs:3565:9\n     |\n3565 |     let logger_clone = logger.clone();\n     |         ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_logger_clone`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 164481,
+              "byte_start": 164469,
+              "column_end": 21,
+              "column_start": 9,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3565,
+              "line_start": 3565,
+              "suggested_replacement": "_logger_clone",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 21,
+                  "highlight_start": 9,
+                  "text": "    let logger_clone = logger.clone();"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `logger_clone`",
+      "spans": [
+        {
+          "byte_end": 164481,
+          "byte_start": 164469,
+          "column_end": 21,
+          "column_start": 9,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3565,
+          "line_start": 3565,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 21,
+              "highlight_start": 9,
+              "text": "    let logger_clone = logger.clone();"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `signature`\n    --> src/processor/sniper_bot.rs:3443:20\n     |\n3443 |                 Ok(signature) => {\n     |                    ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_signature`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 159113,
+              "byte_start": 159104,
+              "column_end": 29,
+              "column_start": 20,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3443,
+              "line_start": 3443,
+              "suggested_replacement": "_signature",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 29,
+                  "highlight_start": 20,
+                  "text": "                Ok(signature) => {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `signature`",
+      "spans": [
+        {
+          "byte_end": 159113,
+          "byte_start": 159104,
+          "column_end": 29,
+          "column_start": 20,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3443,
+          "line_start": 3443,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 29,
+              "highlight_start": 20,
+              "text": "                Ok(signature) => {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: variable `largest_data` is assigned to, but never used\n    --> src/processor/sniper_bot.rs:4233:21\n     |\n4233 |             let mut largest_data: Option<Vec<u8>> = None;\n     |                     ^^^^^^^^^^^^\n     |\n     = note: consider using `_largest_data` instead\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "consider using `_largest_data` instead",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "variable `largest_data` is assigned to, but never used",
+      "spans": [
+        {
+          "byte_end": 197036,
+          "byte_start": 197024,
+          "column_end": 33,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 4233,
+          "line_start": 4233,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 33,
+              "highlight_start": 21,
+              "text": "            let mut largest_data: Option<Vec<u8>> = None;"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: value assigned to `largest_data` is never read\n    --> src/processor/sniper_bot.rs:4240:25\n     |\n4240 |                         largest_data = Some(ix.data.clone());\n     |                         ^^^^^^^^^^^^\n     |\n     = help: maybe it is overwritten before being read?\n     = note: `#[warn(unused_assignments)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "maybe it is overwritten before being read?",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(unused_assignments)]` on by default",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "code": {
+        "code": "unused_assignments",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "value assigned to `largest_data` is never read",
+      "spans": [
+        {
+          "byte_end": 197340,
+          "byte_start": 197328,
+          "column_end": 37,
+          "column_start": 25,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 4240,
+          "line_start": 4240,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 37,
+              "highlight_start": 25,
+              "text": "                        largest_data = Some(ix.data.clone());"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `target_signature`\n    --> src/processor/sniper_bot.rs:3702:21\n     |\n3702 |     if let Some(ref target_signature) = target_signature {\n     |                     ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_target_signature`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 169978,
+              "byte_start": 169962,
+              "column_end": 37,
+              "column_start": 21,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3702,
+              "line_start": 3702,
+              "suggested_replacement": "_target_signature",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 37,
+                  "highlight_start": 21,
+                  "text": "    if let Some(ref target_signature) = target_signature {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `target_signature`",
+      "spans": [
+        {
+          "byte_end": 169978,
+          "byte_start": 169962,
+          "column_end": 37,
+          "column_start": 21,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3702,
+          "line_start": 3702,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 37,
+              "highlight_start": 21,
+              "text": "    if let Some(ref target_signature) = target_signature {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `token_info`\n    --> src/processor/sniper_bot.rs:3713:33\n     |\n3713 |                 if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {\n     |                                 ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_token_info`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 170691,
+              "byte_start": 170681,
+              "column_end": 43,
+              "column_start": 33,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3713,
+              "line_start": 3713,
+              "suggested_replacement": "_token_info",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 43,
+                  "highlight_start": 33,
+                  "text": "                if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `token_info`",
+      "spans": [
+        {
+          "byte_end": 170691,
+          "byte_start": 170681,
+          "column_end": 43,
+          "column_start": 33,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3713,
+          "line_start": 3713,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 43,
+              "highlight_start": 33,
+              "text": "                if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `token_info`\n    --> src/processor/sniper_bot.rs:3776:29\n     |\n3776 |             if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {\n     |                             ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_token_info`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 174476,
+              "byte_start": 174466,
+              "column_end": 39,
+              "column_start": 29,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3776,
+              "line_start": 3776,
+              "suggested_replacement": "_token_info",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 39,
+                  "highlight_start": 29,
+                  "text": "            if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `token_info`",
+      "spans": [
+        {
+          "byte_end": 174476,
+          "byte_start": 174466,
+          "column_end": 39,
+          "column_start": 29,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3776,
+          "line_start": 3776,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 39,
+              "highlight_start": 29,
+              "text": "            if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: variable does not need to be mutable\n    --> src/processor/sniper_bot.rs:3713:29\n     |\n3713 |                 if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {\n     |                             ----^^^^^^^^^^\n     |                             |\n     |                             help: remove this `mut`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove this `mut`",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 170681,
+              "byte_start": 170677,
+              "column_end": 33,
+              "column_start": 29,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3713,
+              "line_start": 3713,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 33,
+                  "highlight_start": 29,
+                  "text": "                if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_mut",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "variable does not need to be mutable",
+      "spans": [
+        {
+          "byte_end": 170691,
+          "byte_start": 170677,
+          "column_end": 43,
+          "column_start": 29,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3713,
+          "line_start": 3713,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 43,
+              "highlight_start": 29,
+              "text": "                if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: variable does not need to be mutable\n    --> src/processor/sniper_bot.rs:3776:25\n     |\n3776 |             if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {\n     |                         ----^^^^^^^^^^\n     |                         |\n     |                         help: remove this `mut`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "remove this `mut`",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 174466,
+              "byte_start": 174462,
+              "column_end": 29,
+              "column_start": 25,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3776,
+              "line_start": 3776,
+              "suggested_replacement": "",
+              "suggestion_applicability": "MachineApplicable",
+              "text": [
+                {
+                  "highlight_end": 29,
+                  "highlight_start": 25,
+                  "text": "            if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_mut",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "variable does not need to be mutable",
+      "spans": [
+        {
+          "byte_end": 174476,
+          "byte_start": 174462,
+          "column_end": 39,
+          "column_start": 25,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3776,
+          "line_start": 3776,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 39,
+              "highlight_start": 25,
+              "text": "            if let Some(mut token_info) = BOUGHT_TOKEN_LIST.get_mut(&parsed_data.mint) {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `logger`\n    --> src/processor/sniper_bot.rs:3396:48\n     |\n3396 | fn check_and_increment_trade_count(mint: &str, logger: &Logger) -> bool {\n     |                                                ^^^^^^ help: if this is intentional, prefix it with an underscore: `_logger`\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 157298,
+              "byte_start": 157292,
+              "column_end": 54,
+              "column_start": 48,
+              "expansion": null,
+              "file_name": "src/processor/sniper_bot.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 3396,
+              "line_start": 3396,
+              "suggested_replacement": "_logger",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 54,
+                  "highlight_start": 48,
+                  "text": "fn check_and_increment_trade_count(mint: &str, logger: &Logger) -> bool {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `logger`",
+      "spans": [
+        {
+          "byte_end": 157298,
+          "byte_start": 157292,
+          "column_end": 54,
+          "column_start": 48,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 3396,
+          "line_start": 3396,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 54,
+              "highlight_start": 48,
+              "text": "fn check_and_increment_trade_count(mint: &str, logger: &Logger) -> bool {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `get_unit_price` is never used\n  --> src/block_engine/tx.rs:34:4\n   |\n34 | fn get_unit_price() -> u64 {\n   |    ^^^^^^^^^^^^^^\n   |\n   = note: `#[warn(dead_code)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(dead_code)]` on by default",
+          "rendered": null,
+          "spans": []
+        }
+      ],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `get_unit_price` is never used",
+      "spans": [
+        {
+          "byte_end": 1218,
+          "byte_start": 1204,
+          "column_end": 18,
+          "column_start": 4,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 34,
+          "line_start": 34,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 18,
+              "highlight_start": 4,
+              "text": "fn get_unit_price() -> u64 {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `get_unit_limit` is never used\n  --> src/block_engine/tx.rs:41:4\n   |\n41 | fn get_unit_limit() -> u32 {\n   |    ^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `get_unit_limit` is never used",
+      "spans": [
+        {
+          "byte_end": 1363,
+          "byte_start": 1349,
+          "column_end": 18,
+          "column_start": 4,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 41,
+          "line_start": 41,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 18,
+              "highlight_start": 4,
+              "text": "fn get_unit_limit() -> u32 {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: static `HTTP_CLIENT` is never used\n  --> src/block_engine/tx.rs:56:8\n   |\n56 | static HTTP_CLIENT: Lazy<Client> = Lazy::new(|| {\n   |        ^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "static `HTTP_CLIENT` is never used",
+      "spans": [
+        {
+          "byte_end": 1824,
+          "byte_start": 1813,
+          "column_end": 19,
+          "column_start": 8,
+          "expansion": null,
+          "file_name": "src/block_engine/tx.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 56,
+          "line_start": 56,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 19,
+              "highlight_start": 8,
+              "text": "static HTTP_CLIENT: Lazy<Client> = Lazy::new(|| {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: method `should_sell_due_to_trailing_stop_with_percentage` is never used\n   --> src/processor/sniper_bot.rs:227:8\n    |\n 89 | impl BoughtTokenInfo {\n    | -------------------- method in this implementation\n...\n227 |     fn should_sell_due_to_trailing_stop_with_percentage(&self, trailing_stop_percentage: f64) -> bool {\n    |        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "method `should_sell_due_to_trailing_stop_with_percentage` is never used",
+      "spans": [
+        {
+          "byte_end": 3531,
+          "byte_start": 3511,
+          "column_end": 21,
+          "column_start": 1,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": false,
+          "label": "method in this implementation",
+          "line_end": 89,
+          "line_start": 89,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 21,
+              "highlight_start": 1,
+              "text": "impl BoughtTokenInfo {"
+            }
+          ]
+        },
+        {
+          "byte_end": 9253,
+          "byte_start": 9205,
+          "column_end": 56,
+          "column_start": 8,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 227,
+          "line_start": 227,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 56,
+              "highlight_start": 8,
+              "text": "    fn should_sell_due_to_trailing_stop_with_percentage(&self, trailing_stop_percentage: f64) -> bool {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `start_wallet_monitoring_internal` is never used\n    --> src/processor/sniper_bot.rs:1273:10\n     |\n1273 | async fn start_wallet_monitoring_internal(app_state: Arc<AppState>) -> Result<(), String> {\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `start_wallet_monitoring_internal` is never used",
+      "spans": [
+        {
+          "byte_end": 61230,
+          "byte_start": 61198,
+          "column_end": 42,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1273,
+          "line_start": 1273,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 42,
+              "highlight_start": 10,
+              "text": "async fn start_wallet_monitoring_internal(app_state: Arc<AppState>) -> Result<(), String> {"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpfun_emergency_sell_with_zeroslot` is never used\n    --> src/processor/sniper_bot.rs:1399:10\n     |\n1399 | async fn execute_pumpfun_emergency_sell_with_zeroslot(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpfun_emergency_sell_with_zeroslot` is never used",
+      "spans": [
+        {
+          "byte_end": 67356,
+          "byte_start": 67312,
+          "column_end": 54,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1399,
+          "line_start": 1399,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 54,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpfun_emergency_sell_with_zeroslot("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpswap_emergency_sell_with_zeroslot` is never used\n    --> src/processor/sniper_bot.rs:1450:10\n     |\n1450 | async fn execute_pumpswap_emergency_sell_with_zeroslot(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpswap_emergency_sell_with_zeroslot` is never used",
+      "spans": [
+        {
+          "byte_end": 69465,
+          "byte_start": 69420,
+          "column_end": 55,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1450,
+          "line_start": 1450,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 55,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpswap_emergency_sell_with_zeroslot("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_jupiter_emergency_sell` is never used\n    --> src/processor/sniper_bot.rs:1501:10\n     |\n1501 | async fn execute_jupiter_emergency_sell(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_jupiter_emergency_sell` is never used",
+      "spans": [
+        {
+          "byte_end": 71595,
+          "byte_start": 71565,
+          "column_end": 40,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1501,
+          "line_start": 1501,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 40,
+              "highlight_start": 10,
+              "text": "async fn execute_jupiter_emergency_sell("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_emergency_sell_with_method` is never used\n    --> src/processor/sniper_bot.rs:1558:10\n     |\n1558 | async fn execute_emergency_sell_with_method(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_emergency_sell_with_method` is never used",
+      "spans": [
+        {
+          "byte_end": 73637,
+          "byte_start": 73603,
+          "column_end": 44,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1558,
+          "line_start": 1558,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 44,
+              "highlight_start": 10,
+              "text": "async fn execute_emergency_sell_with_method("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpfun_emergency_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:1600:10\n     |\n1600 | async fn execute_pumpfun_emergency_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpfun_emergency_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 75493,
+          "byte_start": 75451,
+          "column_end": 52,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1600,
+          "line_start": 1600,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 52,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpfun_emergency_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpswap_emergency_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:1647:10\n     |\n1647 | async fn execute_pumpswap_emergency_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpswap_emergency_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 77401,
+          "byte_start": 77358,
+          "column_end": 53,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1647,
+          "line_start": 1647,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 53,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpswap_emergency_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_raydium_emergency_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:1694:10\n     |\n1694 | async fn execute_raydium_emergency_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_raydium_emergency_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 79336,
+          "byte_start": 79294,
+          "column_end": 52,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 1694,
+          "line_start": 1694,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 52,
+              "highlight_start": 10,
+              "text": "async fn execute_raydium_emergency_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_raydium_emergency_sell_with_zeroslot` is never used\n    --> src/processor/sniper_bot.rs:2106:10\n     |\n2106 | async fn execute_raydium_emergency_sell_with_zeroslot(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_raydium_emergency_sell_with_zeroslot` is never used",
+      "spans": [
+        {
+          "byte_end": 96410,
+          "byte_start": 96366,
+          "column_end": 54,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2106,
+          "line_start": 2106,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 54,
+              "highlight_start": 10,
+              "text": "async fn execute_raydium_emergency_sell_with_zeroslot("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpfun_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:2157:10\n     |\n2157 | async fn execute_pumpfun_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpfun_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 98550,
+          "byte_start": 98518,
+          "column_end": 42,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2157,
+          "line_start": 2157,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 42,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpfun_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_pumpswap_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:2208:10\n     |\n2208 | async fn execute_pumpswap_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_pumpswap_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 100613,
+          "byte_start": 100580,
+          "column_end": 43,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2208,
+          "line_start": 2208,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 43,
+              "highlight_start": 10,
+              "text": "async fn execute_pumpswap_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `execute_raydium_sell_with_normal` is never used\n    --> src/processor/sniper_bot.rs:2310:10\n     |\n2310 | async fn execute_raydium_sell_with_normal(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `execute_raydium_sell_with_normal` is never used",
+      "spans": [
+        {
+          "byte_end": 104761,
+          "byte_start": 104729,
+          "column_end": 42,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 2310,
+          "line_start": 2310,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 42,
+              "highlight_start": 10,
+              "text": "async fn execute_raydium_sell_with_normal("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: function `handle_parsed_data_for_buying` is never used\n    --> src/processor/sniper_bot.rs:4273:10\n     |\n4273 | async fn handle_parsed_data_for_buying(\n     |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n",
+      "$message_type": "diagnostic",
+      "children": [],
+      "code": {
+        "code": "dead_code",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "function `handle_parsed_data_for_buying` is never used",
+      "spans": [
+        {
+          "byte_end": 198614,
+          "byte_start": 198585,
+          "column_end": 39,
+          "column_start": 10,
+          "expansion": null,
+          "file_name": "src/processor/sniper_bot.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 4273,
+          "line_start": 4273,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 39,
+              "highlight_start": 10,
+              "text": "async fn handle_parsed_data_for_buying("
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rendered": "warning: unused variable: `decimals`\n   --> src/main.rs:361:24\n    |\n361 |     for (mint, amount, decimals) in tokens_to_sell {\n    |                        ^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_decimals`\n    |\n    = note: `#[warn(unused_variables)]` on by default\n\n",
+      "$message_type": "diagnostic",
+      "children": [
+        {
+          "children": [],
+          "code": null,
+          "level": "note",
+          "message": "`#[warn(unused_variables)]` on by default",
+          "rendered": null,
+          "spans": []
+        },
+        {
+          "children": [],
+          "code": null,
+          "level": "help",
+          "message": "if this is intentional, prefix it with an underscore",
+          "rendered": null,
+          "spans": [
+            {
+              "byte_end": 12366,
+              "byte_start": 12358,
+              "column_end": 32,
+              "column_start": 24,
+              "expansion": null,
+              "file_name": "src/main.rs",
+              "is_primary": true,
+              "label": null,
+              "line_end": 361,
+              "line_start": 361,
+              "suggested_replacement": "_decimals",
+              "suggestion_applicability": "MaybeIncorrect",
+              "text": [
+                {
+                  "highlight_end": 32,
+                  "highlight_start": 24,
+                  "text": "    for (mint, amount, decimals) in tokens_to_sell {"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "code": {
+        "code": "unused_variables",
+        "explanation": null
+      },
+      "level": "warning",
+      "message": "unused variable: `decimals`",
+      "spans": [
+        {
+          "byte_end": 12366,
+          "byte_start": 12358,
+          "column_end": 32,
+          "column_start": 24,
+          "expansion": null,
+          "file_name": "src/main.rs",
+          "is_primary": true,
+          "label": null,
+          "line_end": 361,
+          "line_start": 361,
+          "suggested_replacement": null,
+          "suggestion_applicability": null,
+          "text": [
+            {
+              "highlight_end": 32,
+              "highlight_start": 24,
+              "text": "    for (mint, amount, decimals) in tokens_to_sell {"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "error_keys": []
+}

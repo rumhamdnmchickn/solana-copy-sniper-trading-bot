@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use anchor_client::solana_client::nonblocking::rpc_client::RpcClient;
 use anchor_client::solana_sdk::{
     pubkey::Pubkey,

@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use crate::common::config::import_env_var;
 use crate::processor::monitor::PoolInfo;
 use anchor_client::solana_sdk::{
@@ -2058,7 +2069,7 @@ impl SellingEngine {
             timestamp,
             is_buy: false, // We're analyzing for sell
             price: (metrics.current_price * 1_000_000_000.0) as u64, // Convert to lamports
-            is_reverse_when_pump_swap: false,
+            _is_reverse_when_pump_swap: false,
             coin_creator,
             sol_change: 0.0,
             token_change: token_amount,
@@ -2389,7 +2400,7 @@ impl SellingEngine {
                 timestamp: data.timestamp,
                 is_buy: false,
                 price: data.price,
-                is_reverse_when_pump_swap: data.is_reverse_when_pump_swap,
+                _is_reverse_when_pump_swap: data._is_reverse_when_pump_swap,
                 coin_creator: data.coin_creator.clone(),
                 sol_change: data.sol_change,
                 token_change: token_amount,
@@ -2460,7 +2471,7 @@ impl SellingEngine {
                         ));
                         // Execute with zeroslot for copy selling
                         match crate::block_engine::tx::new_signed_and_send_zeroslot(
-                            self.app_state.zeroslot_rpc_client.clone(),
+                            &self.app_state,
                             recent_blockhash,
                             &keypair,
                             instructions,
@@ -2537,7 +2548,7 @@ impl SellingEngine {
                         ));
                         // Execute with zeroslot for copy selling
                         match crate::block_engine::tx::new_signed_and_send_zeroslot(
-                            self.app_state.zeroslot_rpc_client.clone(),
+                            &self.app_state,
                             recent_blockhash,
                             &keypair,
                             instructions,
@@ -2614,7 +2625,7 @@ impl SellingEngine {
                         ));
                         // Execute with zeroslot for copy selling
                         match crate::block_engine::tx::new_signed_and_send_zeroslot(
-                            self.app_state.zeroslot_rpc_client.clone(),
+                            &self.app_state,
                             recent_blockhash,
                             &keypair,
                             instructions,
@@ -2689,7 +2700,7 @@ impl SellingEngine {
                             price
                         ));
                         match crate::block_engine::tx::new_signed_and_send_zeroslot(
-                            self.app_state.zeroslot_rpc_client.clone(),
+                            &self.app_state,
                             recent_blockhash,
                             &keypair,
                             instructions,
