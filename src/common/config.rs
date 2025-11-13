@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use crate::processor::swap::SwapProtocol;
 use crate::{
     common::{constants::INIT_MSG, logger::Logger},
@@ -282,8 +293,14 @@ pub fn import_env_var(key: &str) -> String {
     match env::var(key) {
         Ok(res) => res,
         Err(e) => {
-            println!("{}", format!("{}: {}", e, key).red().to_string());
-            loop {}
+            // Provide a clear error message and fail fast instead of busy-spin
+            eprintln!(
+                "{}",
+                format!("Missing required environment variable '{}': {}", key, e)
+                    .red()
+                    .to_string()
+            );
+            panic!("Missing required environment variable: {}", key);
         }
     }
 }
@@ -341,7 +358,7 @@ pub async fn create_coingecko_proxy() -> Result<f64, Error> {
 pub fn import_wallet() -> Result<Arc<Keypair>> {
     let priv_key = import_env_var("PRIVATE_KEY");
     if priv_key.len() < 85 {
-        println!(
+        eprintln!(
             "{}",
             format!(
                 "Please check wallet priv key: Invalid length => {}",
@@ -350,8 +367,13 @@ pub fn import_wallet() -> Result<Arc<Keypair>> {
             .red()
             .to_string()
         );
-        loop {}
+        // Fail fast with a clear message instead of spinning indefinitely
+        panic!(
+            "Invalid PRIVATE_KEY in environment: length {}",
+            priv_key.len()
+        );
     }
+
     let wallet: Keypair = Keypair::from_base58_string(priv_key.as_str());
 
     Ok(Arc::new(wallet))

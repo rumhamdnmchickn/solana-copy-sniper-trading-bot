@@ -1,3 +1,14 @@
+// Quiet planned scaffolding in minimal builds;
+// when features are enabled, clippy will check normally.
+#![cfg_attr(
+    not(any(
+        feature = "zeroslot",
+        feature = "execution_controls",
+        feature = "universal_gates",
+        feature = "position_tracking"
+    )),
+    allow(unused_imports, dead_code)
+)]
 use anchor_client::solana_sdk::{
     hash::Hash,
     instruction::Instruction,
@@ -396,7 +407,7 @@ async fn execute_raydium_sell_attempt(
             .ok_or_else(|| anyhow!("Failed to get recent blockhash"))?;
 
     let signatures = crate::block_engine::tx::new_signed_and_send_zeroslot(
-        app_state.zeroslot_rpc_client.clone(),
+        &app_state,
         recent_blockhash,
         &keypair,
         instructions,

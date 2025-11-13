@@ -44,8 +44,8 @@ pub enum ClientError {
     BondingCurveError(&'static str),
     /// Error deserializing data using Borsh
     BorshError(std::io::Error),
-    /// Error from Solana RPC client
-    SolanaClientError(anchor_client::solana_client::client_error::ClientError),
+    /// Solana client error stored as string to avoid large enum size
+    Solana(String, String),
     /// Error uploading metadata
     UploadMetadataError(Box<dyn std::error::Error>),
     /// Invalid input parameters
@@ -62,8 +62,6 @@ pub enum ClientError {
     ExternalService(String),
 
     Redis(String, String),
-
-    Solana(String, String),
 
     Parse(String, String),
 
@@ -100,7 +98,7 @@ impl std::fmt::Display for ClientError {
             Self::BondingCurveNotFound => write!(f, "Bonding curve not found"),
             Self::BondingCurveError(msg) => write!(f, "Bonding curve error: {}", msg),
             Self::BorshError(err) => write!(f, "Borsh serialization error: {}", err),
-            Self::SolanaClientError(err) => write!(f, "Solana client error: {}", err),
+            Self::Solana(msg, details) => write!(f, "Solana error: {}, details: {}", msg, details),
             Self::UploadMetadataError(err) => write!(f, "Metadata upload error: {}", err),
             Self::InvalidInput(msg) => write!(f, "Invalid input: {}", msg),
             Self::InsufficientFunds => write!(f, "Insufficient funds for transaction"),
@@ -108,7 +106,6 @@ impl std::fmt::Display for ClientError {
             Self::ExternalService(msg) => write!(f, "External service error: {}", msg),
             Self::RateLimitExceeded => write!(f, "Rate limit exceeded"),
             Self::OrderLimitExceeded => write!(f, "Order limit exceeded"),
-            Self::Solana(msg, details) => write!(f, "Solana error: {}, details: {}", msg, details),
             Self::Parse(msg, details) => write!(f, "Parse error: {}, details: {}", msg, details),
             Self::Jito(msg, details) => write!(f, "Jito error: {}, details: {}", msg, details),
             Self::Redis(msg, details) => write!(f, "Redis error: {}, details: {}", msg, details),
@@ -135,7 +132,6 @@ impl std::error::Error for ClientError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::BorshError(err) => Some(err),
-            Self::SolanaClientError(err) => Some(err),
             Self::UploadMetadataError(err) => Some(err.as_ref()),
             Self::ExternalService(_) => None,
             Self::Redis(_, _) => None,
@@ -160,6 +156,7 @@ impl std::error::Error for ClientError {
 
 impl From<SolanaClientError> for ClientError {
     fn from(error: SolanaClientError) -> Self {
+        // Convert the heavy client error into a string-based variant to avoid huge enum size
         ClientError::Solana("Solana client error".to_string(), error.to_string())
     }
 }

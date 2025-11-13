@@ -63,3 +63,16 @@ teloxide = { version = "0.12", features = ["macros"] }
 dashmap = "5.5.3"
 lru = "0.10.0"
 once_cell = "1.21.3"
+
+[features]
+default = []
+runtime_cfg = []
+universal_gates = []
+position_tracking = []
+execution_controls = []
+auto_withdrawals = []
+telegram_control = []
+control_api = []
+dryrun_closed_env = []
+zeroslot = []
+wip = []
