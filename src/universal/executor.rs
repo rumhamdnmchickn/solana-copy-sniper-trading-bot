@@ -1,5 +1,5 @@
 
-use crate::features::gates::{TradeContext, run_gates, LiquidityGate, McapGate, VolatilityGate, PumpFunMigrationGate};
+use crate::universal::gates::{TradeContext, run_gates, LiquidityGate, McapGate, VolatilityGate, PumpFunMigrationGate};
 use super::models::{SimInput, SimResult};
 
 pub struct SimConfig {
@@ -12,7 +12,7 @@ pub struct SimConfig {
 }
 
 pub fn execute_simulated(input: &SimInput, ctx: &TradeContext, cfg: &SimConfig) -> SimResult {
-    let gates: Vec<Box<dyn crate::features::gates::Gate>> = vec![
+    let gates: Vec<Box<dyn crate::universal::gates::Gate>> = vec![
         Box::new(LiquidityGate{min5m:cfg.liq5m, min15m:cfg.liq15m, depth_mult_min:cfg.depth_mult}),
         Box::new(McapGate{min_mcap:cfg.mcap_min}),
         Box::new(VolatilityGate{max_pct:cfg.vol_max_pct}),

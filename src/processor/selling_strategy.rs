@@ -3085,10 +3085,20 @@ impl SellingEngine {
         instructions: Vec<Instruction>,
     ) -> Result<Signature> {
         use solana_sdk::transaction::Transaction;
+        use crate::universal::dry_run::dry_run_send;
+        use crate::common::config::Config;
 
         // Create transaction
         let mut tx = Transaction::new_with_payer(&instructions, Some(&keypair.pubkey()));
         tx.sign(&[keypair], recent_blockhash);
+
+        // DRY RUN: bypass sending if enabled
+        {
+            let config = Config::get().await;
+            if config.dry_run {
+                return Ok(dry_run_send("priority_sell"));
+            }
+        }
 
         // Send with max priority
         match self

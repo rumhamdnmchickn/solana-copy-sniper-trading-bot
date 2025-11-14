@@ -73,6 +73,7 @@ pub struct Config {
     // Sniper configuration
     pub focus_drop_threshold_pct: f64, // percentage drop from initial to flag "dropped"
     pub focus_trigger_sol: f64,        // SOL size to trigger buy after drop
+    pub dry_run: bool,
 }
 
 impl Config {
@@ -117,6 +118,8 @@ impl Config {
                 let focus_trigger_sol = import_env_var("FOCUS_TRIGGER_SOL")
                     .parse::<f64>()
                     .unwrap_or(1.0);
+
+                let dry_run = std::env::var("DRY_RUN").unwrap_or("false".into()) == "true";
 
                 let max_slippage: u64 = 10000;
                 let slippage = if slippage_input > max_slippage {
@@ -195,6 +198,7 @@ impl Config {
                     zero_slot_tip_value,
                     focus_drop_threshold_pct,
                     focus_trigger_sol,
+                    dry_run,
                 })
             })
             .await
