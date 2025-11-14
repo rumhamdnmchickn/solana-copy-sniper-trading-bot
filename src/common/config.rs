@@ -59,6 +59,30 @@ impl FromStr for TransactionLandingMode {
 
 use std::str::FromStr;
 
+
+#[derive(Clone, Debug)]
+pub struct SimulationConfig {
+    pub min_liq_5m: f64,
+    pub min_liq_15m: f64,
+    pub depth_mult: f64,
+    pub min_mcap: f64,
+    pub max_vol_pct: f64,
+    pub exclude_non_migrated: bool,
+}
+
+impl Default for SimulationConfig {
+    fn default() -> Self {
+        Self {
+            min_liq_5m: 1_000.0,
+            min_liq_15m: 3_000.0,
+            depth_mult: 2.0,
+            min_mcap: 50_000.0,
+            max_vol_pct: 50.0,
+            exclude_non_migrated: true,
+        }
+    }
+}
+
 pub struct Config {
     pub yellowstone_grpc_http: String,
     pub yellowstone_grpc_token: String,
@@ -74,6 +98,7 @@ pub struct Config {
     pub focus_drop_threshold_pct: f64, // percentage drop from initial to flag "dropped"
     pub focus_trigger_sol: f64,        // SOL size to trigger buy after drop
     pub dry_run: bool,
+    pub simulation: SimulationConfig,
 }
 
 impl Config {
@@ -120,6 +145,44 @@ impl Config {
                     .unwrap_or(1.0);
 
                 let dry_run = std::env::var("DRY_RUN").unwrap_or("false".into()) == "true";
+                let sim_min_liq_5m = import_env_var("SIM_MIN_LIQ_5M")
+                    .parse::<f64>()
+                    .unwrap_or(1_000.0);
+                let sim_min_liq_15m = import_env_var("SIM_MIN_LIQ_15M")
+                    .parse::<f64>()
+                    .unwrap_or(3_000.0);
+                let sim_depth_mult = import_env_var("SIM_DEPTH_MULT")
+                    .parse::<f64>()
+                    .unwrap_or(2.0);
+                let sim_min_mcap = import_env_var("SIM_MIN_MCAP")
+                    .parse::<f64>()
+                    .unwrap_or(50_000.0);
+                let sim_max_vol_pct = import_env_var("SIM_MAX_VOL_PCT")
+                    .parse::<f64>()
+                    .unwrap_or(50.0);
+                let sim_exclude_non_migrated = import_env_var("SIM_EXCLUDE_NON_MIGRATED")
+                    .parse::<bool>()
+                    .unwrap_or(true);
+
+                let simulation = SimulationConfig {
+                    min_liq_5m: sim_min_liq_5m,
+                    min_liq_15m: sim_min_liq_15m,
+                    depth_mult: sim_depth_mult,
+                    min_mcap: sim_min_mcap,
+                    max_vol_pct: sim_max_vol_pct,
+                    exclude_non_migrated: sim_exclude_non_migrated,
+                };
+                logger.log(format!(
+                    "[SIM CONFIG] min_liq_5m={:.2}, min_liq_15m={:.2}, depth_mult={:.2}, min_mcap={:.2}, max_vol_pct={:.2}, exclude_non_migrated={}",
+                    simulation.min_liq_5m,
+                    simulation.min_liq_15m,
+                    simulation.depth_mult,
+                    simulation.min_mcap,
+                    simulation.max_vol_pct,
+                    simulation.exclude_non_migrated,
+                ));
+
+
 
                 let max_slippage: u64 = 10000;
                 let slippage = if slippage_input > max_slippage {
@@ -199,6 +262,7 @@ impl Config {
                     focus_drop_threshold_pct,
                     focus_trigger_sol,
                     dry_run,
+                    simulation,
                 })
             })
             .await

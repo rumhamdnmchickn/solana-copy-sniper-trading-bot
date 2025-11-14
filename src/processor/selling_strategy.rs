@@ -1519,7 +1519,78 @@ impl SellingEngine {
     /// - use_whale_emergency: true if should use emergency zeroslot selling for whale transactions
     ///
     /// Note: Bot always sells all tokens when sell conditions are met
-    pub async fn evaluate_sell_conditions(&self, token_mint: &str) -> Result<(bool, bool)> {
+        fn build_trade_context_from_metrics(
+        &self,
+        token_mint: &str,
+        metrics: &TokenMetrics,
+    ) -> crate::universal::gates::TradeContext {
+        use crate::universal::gates::TradeContext;
+
+        let price_usd = metrics.current_price;
+
+        // Approximate 5m and 15m volume windows from 24h volume
+        // 24h = 288 x 5m, 24h = 96 x 15m
+        let window5m_usd = metrics.volume_24h / 288.0;
+        let window15m_usd = metrics.volume_24h / 96.0;
+
+        let notional = price_usd * metrics.amount_held.max(0.0);
+        let depth_multiple = if notional > 0.0 {
+            metrics.liquidity_at_current / notional
+        } else {
+            0.0
+        };
+
+        let est_mcap_usd = if metrics.market_cap > 0.0 {
+            Some(metrics.market_cap)
+        } else {
+            None
+        };
+
+        let window_vol_pct = if metrics.price_history.len() >= 2 {
+            let mut min_price = f64::MAX;
+            let mut max_price = f64::MIN;
+            for &p in metrics.price_history.iter() {
+                if p < min_price {
+                    min_price = p;
+                }
+                if p > max_price {
+                    max_price = p;
+                }
+            }
+            let avg = metrics.price_history.iter().sum::<f64>() / metrics.price_history.len() as f64;
+            if avg > 0.0 {
+                (max_price - min_price) / avg * 100.0
+            } else {
+                0.0
+            }
+        } else {
+            0.0
+        };
+
+        let is_pumpfun = matches!(metrics.protocol, SwapProtocol::PumpFun);
+
+        let target_wallet = match self.app_state.wallet.try_pubkey() {
+            Ok(pk) => pk.to_string(),
+            Err(_) => "unknown_wallet".to_string(),
+        };
+
+        TradeContext {
+            mint: token_mint.to_string(),
+            target_wallet,
+            price_usd,
+            est_cost_bps: 0.0, // TODO: derive from slippage / fees
+            window5m_usd,
+            window15m_usd,
+            depth_multiple,
+            est_mcap_usd,
+            window_vol_pct,
+            is_pumpfun,
+            pumpfun_migrated: None,
+        }
+    }
+
+
+pub async fn evaluate_sell_conditions(&self, token_mint: &str) -> Result<(bool, bool)> {
         // Get metrics for the token using DashMap's get() method
         let metrics = match TOKEN_METRICS.get(token_mint) {
             Some(metrics) => metrics.clone(),
@@ -2309,6 +2380,53 @@ impl SellingEngine {
             );
         }
 
+        // DRY RUN: simulation-only path using universal gates
+        {
+            use crate::common::config::Config;
+            use crate::universal::executor::{SimBackend, SimulationAction, ExecutionSimulator};
+
+            let config = Config::get().await;
+            if config.dry_run {
+                // Attempt to read TokenMetrics for this mint
+                let maybe_metrics = TOKEN_METRICS.get(token_mint).map(|m| m.clone());
+
+                if let Some(metrics) = maybe_metrics {
+                    let trade_ctx = self.build_trade_context_from_metrics(token_mint, &metrics);
+                    let sim_cfg = crate::universal::executor::SimConfig {
+                    liq5m: config.simulation.min_liq_5m,
+                    liq15m: config.simulation.min_liq_15m,
+                    depth_mult: config.simulation.depth_mult,
+                    mcap_min: config.simulation.min_mcap,
+                    vol_max_pct: config.simulation.max_vol_pct,
+                    exclude_non_migrated: config.simulation.exclude_non_migrated,
+                };
+
+                let backend = SimBackend::new(sim_cfg);
+                    let sim_result = backend.simulate(&trade_ctx, SimulationAction::Sell);
+
+                    self.logger.log(
+                        format!(
+                            "[DRY RUN][SIM] emergency sell simulation result for {}: {:?}",
+                            token_mint, sim_result
+                        )
+                        .cyan()
+                        .to_string(),
+                    );
+                } else {
+                    self.logger.log(
+                        format!(
+                            "[DRY RUN][SIM] No TokenMetrics found for {}; skipping gate simulation",
+                            token_mint
+                        )
+                        .yellow()
+                        .to_string(),
+                    );
+                }
+
+                return Ok("[DRY-RUN] simulated emergency sell".to_string());
+            }
+        }
+
         // Get wallet pubkey
         let wallet_pubkey = self
             .app_state
@@ -3087,20 +3205,57 @@ impl SellingEngine {
         use solana_sdk::transaction::Transaction;
         use crate::universal::dry_run::dry_run_send;
         use crate::common::config::Config;
+        use crate::universal::executor::{SimBackend, SimulationAction, ExecutionSimulator};
+        use crate::universal::gates::TradeContext;
 
         // Create transaction
         let mut tx = Transaction::new_with_payer(&instructions, Some(&keypair.pubkey()));
         tx.sign(&[keypair], recent_blockhash);
 
-        // DRY RUN: bypass sending if enabled
+        // DRY RUN: use simulation backend instead of sending
         {
             let config = Config::get().await;
             if config.dry_run {
+                // TODO: Populate TradeContext with real metrics (liquidity, volume, mcap, etc.)
+                // once we have easy access to them at this call site.
+                let trade_ctx = TradeContext {
+                    mint: "unknown".to_string(),
+                    target_wallet: keypair.pubkey().to_string(),
+                    price_usd: 0.0,
+                    est_cost_bps: 0.0,
+                    window5m_usd: 0.0,
+                    window15m_usd: 0.0,
+                    depth_multiple: 0.0,
+                    est_mcap_usd: None,
+                    window_vol_pct: 0.0,
+                    is_pumpfun: false,
+                    pumpfun_migrated: None,
+                };
+
+                let sim_cfg = crate::universal::executor::SimConfig {
+                    liq5m: config.simulation.min_liq_5m,
+                    liq15m: config.simulation.min_liq_15m,
+                    depth_mult: config.simulation.depth_mult,
+                    mcap_min: config.simulation.min_mcap,
+                    vol_max_pct: config.simulation.max_vol_pct,
+                    exclude_non_migrated: config.simulation.exclude_non_migrated,
+                };
+
+                let backend = SimBackend::new(sim_cfg);
+                let sim_result = backend.simulate(&trade_ctx, SimulationAction::Sell);
+
+                // Log structured simulation output so you can inspect results
+                self.logger.log(format!(
+                    "[DRY RUN][SIM] priority transaction simulation result: {:?}",
+                    sim_result
+                ));
+
+                // Return a mock signature just like Option A
                 return Ok(dry_run_send("priority_sell"));
             }
         }
 
-        // Send with max priority
+        // Non-dry-run: send with max priority (existing behavior)
         match self
             .app_state
             .rpc_nonblocking_client
