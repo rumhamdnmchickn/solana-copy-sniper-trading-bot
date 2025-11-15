@@ -185,7 +185,7 @@ impl Config {
 
 
                 let max_slippage: u64 = 10000;
-                let slippage = if slippage_input > max_slippage {
+                let base_slippage = if slippage_input > max_slippage {
                     max_slippage
                 } else {
                     slippage_input
@@ -216,6 +216,32 @@ impl Config {
                     .unwrap_or(0.001_f64); //quantity
                                            // let in_type = "pct"; //percentage
                                            // let amount_in = 0.5; //percentage
+
+// Resolve effective slippage for this wallet using per-wallet overrides.
+//
+// - `base_slippage` is the env-provided default in basis points (clamped).
+// - Wallet-level overrides come from WALLET_CONFIG_TOML as a *fraction*.
+// - Final `slippage` here is again in basis points for SwapConfig.
+let wallet_pubkey_str = wallet.pubkey().to_string();
+let default_slippage_fraction = base_slippage as f64 / 10_000.0;
+
+let effective_slippage_fraction = crate::universal::wallet_config::get_wallet_config_map()
+    .get_slippage(&wallet_pubkey_str)
+    .unwrap_or(default_slippage_fraction);
+
+// Convert back from fraction to basis points and clamp to [0, max_slippage].
+let mut slippage = (effective_slippage_fraction * 10_000.0).round() as u64;
+if slippage > max_slippage {
+    slippage = max_slippage;
+}
+
+logger.log(format!(
+    "[WALLET SLIPPAGE] wallet={} default_frac={:.4} effective_frac={:.4} slippage_bps={}",
+    wallet_pubkey_str,
+    default_slippage_fraction,
+    effective_slippage_fraction,
+    slippage,
+));
 
                 let swap_config = SwapConfig {
                     swap_direction,
