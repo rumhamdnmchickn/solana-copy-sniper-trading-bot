@@ -1,6 +1,10 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod liquidity;
+pub use liquidity::LiquidityGate;
+
+
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TradeContext {
     pub mint: String,
@@ -27,26 +31,10 @@ pub trait Gate: Send + Sync {
     fn check(&self, ctx: &TradeContext) -> GateDecision;
 }
 
-pub struct LiquidityGate { pub min5m: f64, pub min15m: f64, pub depth_mult_min: f64 }
+
 pub struct McapGate { pub min_mcap: f64 }
 pub struct VolatilityGate { pub max_pct: f64 }
 pub struct PumpFunMigrationGate { pub exclude_non_migrated: bool }
-
-impl Gate for LiquidityGate {
-    fn name(&self) -> &'static str { "LiquidityGate" }
-    fn check(&self, ctx: &TradeContext) -> GateDecision {
-        if ctx.window5m_usd < self.min5m {
-            return GateDecision::Rejected{reason: format!("5m_liq_usd {} < {}", ctx.window5m_usd, self.min5m)};
-        }
-        if ctx.window15m_usd < self.min15m {
-            return GateDecision::Rejected{reason: format!("15m_liq_usd {} < {}", ctx.window15m_usd, self.min15m)};
-        }
-        if ctx.depth_multiple < self.depth_mult_min {
-            return GateDecision::Rejected{reason: format!("depth_multiple {} < {}", ctx.depth_multiple, self.depth_mult_min)};
-        }
-        GateDecision::Passed
-    }
-}
 
 impl Gate for McapGate {
     fn name(&self) -> &'static str { "McapGate" }

@@ -1204,6 +1204,22 @@ pub async fn execute_buy(
                                                 .as_secs();
                                             BOUGHT_TOKENS_BLACKLIST.insert(trade_info.mint.clone(), timestamp);
                                             logger.log(format!("🚫 Added {} to permanent blacklist", trade_info.mint));
+                                            #[cfg(feature = "position_tracking")]
+                                            {
+                                                use crate::universal::positions::GLOBAL_POSITIONS_REGISTRY;
+                                                let wallet_str = wallet_pubkey.to_string();
+                                                let now_ts = std::time::SystemTime::now()
+                                                    .duration_since(std::time::UNIX_EPOCH)
+                                                    .unwrap_or_default()
+                                                    .as_secs() as i64;
+                                                if let Err(e) = GLOBAL_POSITIONS_REGISTRY.record_open(&wallet_str, &trade_info.mint, now_ts) {
+                                                    logger.log(format!(
+                                                        "⚠️ Failed to record open position for token {} (PumpSwap): {}",
+                                                        trade_info.mint,
+                                                        e
+                                                    ));
+                                                }
+                                            }
                                             
                                             // CRITICAL FIX: Update selling strategy with actual token balance after successful buy
                                             let selling_engine = crate::processor::selling_strategy::SellingEngine::new(

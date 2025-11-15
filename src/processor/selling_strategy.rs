@@ -2689,6 +2689,20 @@ pub async fn evaluate_sell_conditions(&self, token_mint: &str) -> Result<(bool, 
                                     .to_string(),
                                 );
 
+                                #[cfg(feature = "position_tracking")]
+                                {
+                                    use crate::universal::positions::GLOBAL_POSITIONS_REGISTRY;
+                                    if let Ok(wallet_pubkey) = self.app_state.wallet.try_pubkey() {
+                                        let wallet_str = wallet_pubkey.to_string();
+                                        if let Err(e) = GLOBAL_POSITIONS_REGISTRY.record_close(&wallet_str, token_mint) {
+                                            self.logger.log(format!(
+                                                "⚠️ Failed to record close position for token {} (PumpSwap): {}",
+                                                token_mint,
+                                                e
+                                            ));
+                                        }
+                                    }
+                                }
                                 Ok(signature.to_string())
                             }
                             Err(e) => {

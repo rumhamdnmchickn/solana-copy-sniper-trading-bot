@@ -6,6 +6,7 @@ use crate::universal::gates::{
     VolatilityGate,
     PumpFunMigrationGate,
 };
+use crate::universal::gates::liquidity::LiquidityGateConfig;
 
 /// Configuration for the simulation backend.
 /// These thresholds mirror the intent of your gates:
@@ -99,21 +100,22 @@ impl ExecutionSimulator for SimBackend {
         //   VolatilityGate { max_pct }
         //   PumpFunMigrationGate { exclude_non_migrated }
         let gates: Vec<Box<dyn crate::universal::gates::Gate>> = vec![
-            Box::new(LiquidityGate {
-                min5m: self.cfg.liq5m,
-                min15m: self.cfg.liq15m,
-                depth_mult_min: self.cfg.depth_mult,
-            }),
-            Box::new(McapGate {
-                min_mcap: self.cfg.mcap_min,
-            }),
-            Box::new(VolatilityGate {
-                max_pct: self.cfg.vol_max_pct,
-            }),
-            Box::new(PumpFunMigrationGate {
-                exclude_non_migrated: self.cfg.exclude_non_migrated,
-            }),
-        ];
+    Box::new(LiquidityGate::new(LiquidityGateConfig {
+        liq_5m_min_usd: self.cfg.liq5m,
+        liq_15m_min_usd: self.cfg.liq15m,
+        min_mcap_usd: self.cfg.mcap_min,
+        depth_mult_min: self.cfg.depth_mult,
+    })),
+    Box::new(McapGate {
+        min_mcap: self.cfg.mcap_min,
+    }),
+    Box::new(VolatilityGate {
+        max_pct: self.cfg.vol_max_pct,
+    }),
+    Box::new(PumpFunMigrationGate {
+        exclude_non_migrated: self.cfg.exclude_non_migrated,
+    }),
+];
 
         let (ok, reasons) = run_gates(ctx, &gates);
 
